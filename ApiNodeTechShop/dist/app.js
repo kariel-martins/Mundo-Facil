@@ -13,6 +13,8 @@ const requestCounter = new prom_client_1.Counter({
     name: 'http_request_total',
     help: 'Total de requisições HTTP recebidas',
 });
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: true }));
 app.use((req, res, next) => {
     requestCounter.inc();
     next();

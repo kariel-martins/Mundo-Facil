@@ -10,6 +10,7 @@ export class AuthRepository {
       const auth = await db.insert(users).values(data).returning();
       return auth[0] ?? null;
     } catch (err) {
+      console.error(err)
       throw new AppError(
         "Error ao criar o usuáiro",
         500,
@@ -18,10 +19,10 @@ export class AuthRepository {
     }
   }
   async emailVerificationCreate(
-    data: emailVerification
+    token: string, time: Date
   ): Promise<emailVerification | null> {
     try {
-      const auth = await db.insert(emailVerifications).values(data).returning();
+      const auth = await db.insert(emailVerifications).values({tokenHash: token, expiresAt: time}).returning();
       return auth[0] ?? null;
     } catch {
       throw new AppError(

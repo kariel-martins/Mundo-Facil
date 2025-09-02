@@ -2,6 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = require("express");
+const schemas_dto_1 = require("./modules/Auth/dtos/schemas.dto");
+const controller_auth_1 = require("./modules/Auth/controllers/controller.auth");
 const router = (0, express_1.Router)();
 exports.router = router;
-router.get("/", (_req, res) => { res.send("Óla, Dev"); });
+router.get("/", (_req, res) => { res.status(200).json({ message: "servidor rodando" }); });
+router.post("/signUp", schemas_dto_1.validateSigUp, controller_auth_1.signUp);

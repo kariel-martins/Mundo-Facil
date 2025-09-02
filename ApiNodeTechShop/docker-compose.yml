@@ -1,10 +1,11 @@
 networks:
   monitoring:
     driver: bridge
+
 volumes:
-    prometheus_data: {}
-    grafana_data: {}
-    postgres_data: {}
+  prometheus_data: {}
+  grafana_data: {}
+  postgres_data: {}
 
 services:
   prometheus:
@@ -14,11 +15,12 @@ services:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
     ports:
-      - 9090:9090
+      - "9090:9090"
     expose:
       - 9090
     networks:
       - monitoring
+
   grafana:
     image: grafana/grafana:7.1.5
     container_name: grafana
@@ -30,11 +32,12 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     ports:
-      - 3000:3000
+      - "3000:3000"
     expose:
       - 3000
     networks:
       - monitoring
+
   postgres:
     image: postgres:17
     container_name: nodeTechShop_db
@@ -47,6 +50,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   # porta para apps se conectarem
+      - "15672:15672" # painel de admin do RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - monitoring
 
   node-application-monitoring-app:
     build:
@@ -59,11 +77,16 @@ services:
       - 5050
     depends_on:
       - postgres
+      - rabbitmq
     environment:
-      DB_HOST: postgres
-      DB_USER: kariel
-      DB_PASSWORD: karielpass
-      DB_NAME: techshop
-      DB_PORT: 5432
+      # Postgres
+      URL_DATABASE: postgres://kariel:karielpass@postgres:5432/techshop
+      
+      # jwtsecret
+      JWT_SECRET: 202b54a2a4cdeb326c4c3a2bc620e936b82ba66ef948e0420c6063ef52e6e870221d71a298d43ac3ac03d192145d66b9a6b7036872b6ace4c92313af2a87edec
+
+      # RabbitMQ
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
     networks:
       - monitoring

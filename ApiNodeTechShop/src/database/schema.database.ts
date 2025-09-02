@@ -18,10 +18,10 @@ export const users = pgTable("users", {
 
 export const emailVerifications = pgTable("email_verifications", {
   id: uuid().primaryKey().notNull().defaultRandom(),
-  userId: uuid("user_id").notNull().references(()=> users.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(()=> users.id, { onDelete: "cascade" }),
   tokenHash: text().notNull(),
   expiresAt: timestamp("exipres_At", {withTimezone: true}).notNull(),
-  consumeAt: timestamp("consumer_At", {withTimezone: true}).notNull(),
+  consumeAt: timestamp("consumer_At", {withTimezone: true}),
   createdAt: timestamp("created_at", {withTimezone: true}).notNull().default(sql`NOW()`)
 })
 

@@ -1,7 +1,9 @@
 import { AppError } from "../errors/AppErro";
+import dotenv from "dotenv"
+dotenv.config()
 
 export function env() {
-  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET"] as const;
+  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET", "RABBITMQ_URL"] as const;
 
   reqVars.forEach((key) => {
     if (!process.env[key])
@@ -12,5 +14,6 @@ export function env() {
     port: Number(process.env.PORT) || 3333,
     urlDatabase: process.env.URL_DATABASE,
     jwtSecret: process.env.JWT_SECRET,
+    rabbitMQ: process.env.RABBITMQ_URL, 
   };
 }
