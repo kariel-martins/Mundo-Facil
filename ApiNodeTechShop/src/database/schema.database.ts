@@ -13,16 +13,16 @@ export const users = pgTable("users", {
   passwordHash: text().notNull(),
   email_verified_at: timestamp("email_verified_at", { withTimezone: true}),
   status: varchar("status", {length: 20}).notNull().default("pending"),
-  createdAt: timestamp("created_at", {withTimezone: true}).notNull().default(sql`NOW()`)
+  created_At: timestamp("created_At", {withTimezone: true}).notNull().default(sql`NOW()`)
 });
 
-export const emailVerifications = pgTable("email_verifications", {
+export const email_Verifications = pgTable("email_verifications", {
   id: uuid().primaryKey().notNull().defaultRandom(),
-  userId: uuid("user_id").references(()=> users.id, { onDelete: "cascade" }),
+  user_Id: uuid("user_id").references(()=> users.id, { onDelete: "cascade" }),
   tokenHash: text().notNull(),
-  expiresAt: timestamp("exipres_At", {withTimezone: true}).notNull(),
-  consumeAt: timestamp("consumer_At", {withTimezone: true}),
-  createdAt: timestamp("created_at", {withTimezone: true}).notNull().default(sql`NOW()`)
+  expires_At: timestamp("expires_At", {withTimezone: true}).notNull(),
+  consume_At: timestamp("consumer_At", {withTimezone: true}),
+  created_At: timestamp("created_At", {withTimezone: true}).notNull().default(sql`NOW()`)
 })
 
 export const products = pgTable("products", {

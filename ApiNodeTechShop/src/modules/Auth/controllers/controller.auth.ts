@@ -55,7 +55,7 @@ export const signUp: RequestHandler = async (req, res) => {
       return;
     }
     const token = await tokenService.signToken(uid, 15)
-    const userToken = await service.createTokenUser(token, 15)
+    const userToken = await service.createTokenUser(token, 15, uid)
 
     await publishUserCreated({
       id: uid,
@@ -66,7 +66,7 @@ export const signUp: RequestHandler = async (req, res) => {
       userId: uid,
       email: user.email,
       token: userToken.tokenHash,
-      expiresAt: userToken.expiresAt.toISOString()
+      expiresAt: userToken.expires_At.toISOString()
     });
     res.status(200).json({ id:user.id, email: user.email });
   }

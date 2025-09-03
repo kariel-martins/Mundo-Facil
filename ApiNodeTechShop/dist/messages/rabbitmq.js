@@ -27,8 +27,8 @@ async function createConnection() {
         pubChannel = null;
         subChannel = null;
         // backoff simples
-        await new Promise(r => setTimeout(r, 2000));
-        await ensureConnection();
+        await new Promise(r => setTimeout(r, 2000)); //espera 2s
+        await ensureConnection(); // tenta reconectar
     });
     return conn;
 }

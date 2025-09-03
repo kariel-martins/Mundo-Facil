@@ -61,14 +61,15 @@ export class AuthService {
       );
     }
   }
-  async createTokenUser(token: string, minutes: number): Promise<emailVerification> {
+  async createTokenUser(token: string, minutes: number, user_Id: string): Promise<emailVerification> {
     const now = new Date()
     const time = new Date(now.getTime() + minutes * 60 * 1000)
     if (!time) throw new AppError("Erro ao gera a data", 500, "auth/services/service.auth.ts/createTokenUser")
     try {
-      const auth = await this.repo.emailVerificationCreate(token, time);
+      const auth = await this.repo.emailVerificationCreate(token, time, user_Id);
       if (!auth)
         throw new AppError("Error ao criar o token de verificação", 400);
+      console.log("auth/services/service.auth.ts/createTokenUser", auth)
       return auth;
     } catch {
       throw new AppError(
