@@ -16,9 +16,9 @@ class AuthRepository {
             throw new AppErro_1.AppError("Error ao criar o usuáiro", 500, "aut/repositeries/auth.repository.ts/create");
         }
     }
-    async emailVerificationCreate(data) {
+    async emailVerificationCreate(token, time) {
         try {
-            const auth = await client_database_1.db.insert(schema_database_1.emailVerifications).values(data).returning();
+            const auth = await client_database_1.db.insert(schema_database_1.emailVerifications).values({ tokenHash: token, expiresAt: time }).returning();
             return auth[0] ?? null;
         }
         catch {

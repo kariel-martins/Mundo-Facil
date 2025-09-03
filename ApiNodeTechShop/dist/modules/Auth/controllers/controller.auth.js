@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resertPassword = exports.forgotPassword = exports.sigIn = exports.verifyEmail = exports.signUp = void 0;
 const service_auth_1 = require("../services/service.auth");
 const PasswordCrypto_1 = require("../../../share/services/PasswordCrypto");
-const JWTService_1 = require("../../../share/services/JWTService");
-const auth_producers_1 = require("../../../messaging/producers/auth.producers");
+const auth_producers_1 = require("../../../messages/producers/auth.producers");
+const tokenService = new service_auth_1.AuthTokenService();
 const service = new service_auth_1.AuthService();
 const signUp = async (req, res) => {
     const { name, email, password, confPassword } = req.body;
@@ -13,9 +13,11 @@ const signUp = async (req, res) => {
         return;
     }
     if (password !== confPassword) {
-        res.status(400).json({ errors: {
-                default: "Senhas não coincidem."
-            } });
+        res.status(400).json({
+            errors: {
+                default: "Senhas não coincidem.",
+            },
+        });
         return;
     }
     try {
@@ -24,35 +26,44 @@ const signUp = async (req, res) => {
         return;
     }
     catch {
-        const passwordHash = (await PasswordCrypto_1.passwordCrypto.hashPassword(password)).toString();
+        const passwordHash = (await PasswordCrypto_1.passwordCrypto.hashText(password)).toString();
         const user = await service.createUser({ name, email, passwordHash });
-        await (0, auth_producers_1.publishOrderCreated)(user);
         if (!user) {
-            res.status(400).json({ errors: {
-                    default: "Não foi possível criar o usuário"
-                } });
+            res.status(400).json({
+                errors: {
+                    default: "Não foi possível criar o usuário",
+                },
+            });
             return;
         }
         const uid = user.id;
         if (uid === undefined) {
-            res.status(404).json({ errors: {
-                    default: "Id do usuario não encontrado"
-                } });
+            res.status(404).json({
+                errors: {
+                    default: "Id do usuario não encontrado",
+                },
+            });
             return;
         }
-        const tokenVerication = JWTService_1.JWTService.sign({ scope: uid });
-        if (!tokenVerication || tokenVerication === "JWT_SECRET_NOT_FOUND") {
-            res.status(500).json({ errors: {
-                    default: "Erro ao gera o token"
-                } });
-            return;
-        }
-        res.status(200).json({ user });
+        const token = await tokenService.signToken(uid, 15);
+        const userToken = await service.createTokenUser(token, 15);
+        await (0, auth_producers_1.publishUserCreated)({
+            id: uid,
+            name: user.name,
+            email: user.email,
+        });
+        await (0, auth_producers_1.publishEmailVerificationRequested)({
+            userId: uid,
+            email: user.email,
+            token: userToken.tokenHash,
+            expiresAt: userToken.expiresAt.toISOString()
+        });
+        res.status(200).json({ id: user.id, email: user.email });
     }
 };
 exports.signUp = signUp;
 const verifyEmail = (req, res) => {
-    const token = req.cookies['verifyEmail'];
+    const token = req.cookies["verifyEmail"];
     if (!token) {
         res.status(401).json({ errors: { default: "Token não encotrado." } });
         return;

@@ -19,10 +19,10 @@ exports.users = (0, pg_core_6.pgTable)("users", {
 });
 exports.emailVerifications = (0, pg_core_6.pgTable)("email_verifications", {
     id: (0, pg_core_5.uuid)().primaryKey().notNull().defaultRandom(),
-    userId: (0, pg_core_5.uuid)("user_id").notNull().references(() => exports.users.id, { onDelete: "cascade" }),
+    userId: (0, pg_core_5.uuid)("user_id").references(() => exports.users.id, { onDelete: "cascade" }),
     tokenHash: (0, pg_core_1.text)().notNull(),
     expiresAt: (0, pg_core_2.timestamp)("exipres_At", { withTimezone: true }).notNull(),
-    consumeAt: (0, pg_core_2.timestamp)("consumer_At", { withTimezone: true }).notNull(),
+    consumeAt: (0, pg_core_2.timestamp)("consumer_At", { withTimezone: true }),
     createdAt: (0, pg_core_2.timestamp)("created_at", { withTimezone: true }).notNull().default((0, drizzle_orm_1.sql) `NOW()`)
 });
 exports.products = (0, pg_core_6.pgTable)("products", {

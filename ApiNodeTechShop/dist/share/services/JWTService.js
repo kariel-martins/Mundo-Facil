@@ -37,26 +37,33 @@ exports.JWTService = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const env_1 = require("../../config/env");
 const { jwtSecret } = (0, env_1.env)();
-const sign = (data, expireInMinutes = 15) => {
-    if (!jwtSecret)
-        return "JWT_SECRET_NOT_FOUND";
-    return jwt.sign(data, jwtSecret, { expiresIn: `${expireInMinutes}m` });
-};
-const verify = (token) => {
-    if (!jwtSecret)
-        return "JWT_SECRET_NOT_FOUND";
-    try {
-        const decoded = jwt.verify(token, jwtSecret);
-        if (typeof decoded === "string") {
-            return "INVALID_TOKEN";
+class JWTService {
+    async sign(data, expireInMinutes = 15) {
+        if (!jwtSecret)
+            return "JWT_SECRET_NOT_FOUND";
+        try {
+            const result = await jwt.sign(data, jwtSecret, {
+                expiresIn: `${expireInMinutes}m`,
+            });
+            return result;
         }
-        return decoded;
+        catch {
+            return "ERRO_TOKEN_SIGN";
+        }
     }
-    catch {
-        return "INVALID_TOKEN";
+    verify(token) {
+        if (!jwtSecret)
+            return "JWT_SECRET_NOT_FOUND";
+        try {
+            const decoded = jwt.verify(token, jwtSecret);
+            if (typeof decoded === "string") {
+                return "INVALID_TOKEN";
+            }
+            return decoded;
+        }
+        catch {
+            return "ERRO_TOKEN_VERIFY";
+        }
     }
-};
-exports.JWTService = {
-    sign,
-    verify,
-};
+}
+exports.JWTService = JWTService;
