@@ -71,11 +71,19 @@ export async function assertQueueWithDLQ(
     deadLetterExchange: dlx,
     deadLetterRoutingKey,
   });
+  const dlq = `${queue}.dead`;
+  await ch.assertQueue(dlq, { durable: true });
+  await ch.bindQueue(dlq, dlx, deadLetterRoutingKey);
   return ch;
 }
 
 export async function bindQueue(queue: string, exchange: string, pattern: string) {
   const ch = await getSubscriberChannel();
+  try {
+    await ch.checkExchange(exchange)
+  } catch {
+    await ch.assertExchange(exchange, "topic", { durable: true });
+  }
   await ch.bindQueue(queue, exchange, pattern);
 }
 

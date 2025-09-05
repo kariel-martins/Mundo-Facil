@@ -1,12 +1,18 @@
 import { AppError } from "../../../errors/AppErro";
+import {
+  publishEmailVerificationRequested,
+  publishUserCreated,
+} from "../../../messages/producers/auth.producers";
+import { getPublisherChannel } from "../../../messages/rabbitmq";
 import { JWTService } from "../../../share/services/JWTService";
+import { passwordCrypto } from "../../../share/services/PasswordCrypto";
 import { authInsert, emailVerification } from "../dtos/types.dto.auth";
 import { AuthRepository } from "../repositories/auth.repository";
 
 interface dataData {
   name: string;
   email: string;
-  passwordHash: string;
+  password: string;
 }
 export class AuthTokenService {
   private jwtService = new JWTService();
@@ -35,7 +41,7 @@ export class AuthTokenService {
         authToken === "INVALID_TOKEN"
       )
         throw new AppError("Erro ao verificar o token", 400);
-        return authToken;
+      return authToken;
     } catch {
       throw new AppError(
         "Não foi possível verificar o token",
@@ -47,29 +53,66 @@ export class AuthTokenService {
 }
 export class AuthService {
   private repo = new AuthRepository();
+  private tokenService = new AuthTokenService();
 
-  async createUser(data: dataData): Promise<authInsert> {
+  public async registerUser(data: dataData): Promise<authInsert> {
     try {
-      const auth = await this.repo.create(data);
-      if (!auth) throw new AppError("Error ao criar o usuário", 400);
-      return auth;
-    } catch (err) {
-      throw new AppError(
-        "Não foi possíel criar o usuário",
-        500,
-        "auth/services/service.auth.ts/createUser"
-      );
+      await this.getByEmail(data.email);
+      throw new AppError("Email já existe", 409);
+    } catch {
+      try {
+        // criar o usuário
+        const passwordHash = await passwordCrypto.hashText(data.password);
+        const auth = await this.repo.create({ ...data, passwordHash });
+        if (!auth) throw new AppError("Error ao criar o usuário", 400);
+        // cria o token de verificão
+        const uid = auth.id;
+        if (!uid) throw new AppError("Id Não encotrado!");
+        const token = await this.tokenService.signToken(uid, 15);
+        const userToken = await this.createTokenUser(token, 15, uid);
+        // Publicar eventos
+        await publishUserCreated({
+          id: uid,
+          name: auth.name,
+          email: auth.email,
+        });
+        await publishEmailVerificationRequested({
+          userId: uid,
+          email: auth.email,
+          token: userToken.tokenHash,
+          expiresAt: userToken.expires_at.toISOString(),
+        });
+        return auth;
+      } catch (err) {
+        throw new AppError(
+          "Não foi possíel criar o usuário",
+          500,
+          "auth/services/service.auth.ts/createUser"
+        );
+      }
     }
   }
-  async createTokenUser(token: string, minutes: number, user_Id: string): Promise<emailVerification> {
-    const now = new Date()
-    const time = new Date(now.getTime() + minutes * 60 * 1000)
-    if (!time) throw new AppError("Erro ao gera a data", 500, "auth/services/service.auth.ts/createTokenUser")
+  async createTokenUser(
+    token: string,
+    minutes: number,
+    user_Id: string
+  ): Promise<emailVerification> {
+    const now = new Date();
+    const time = new Date(now.getTime() + minutes * 60 * 1000);
+    if (!time)
+      throw new AppError(
+        "Erro ao gera a data",
+        500,
+        "auth/services/service.auth.ts/createTokenUser"
+      );
     try {
-      const auth = await this.repo.emailVerificationCreate(token, time, user_Id);
+      const auth = await this.repo.emailVerificationCreate(
+        token,
+        time,
+        user_Id
+      );
       if (!auth)
         throw new AppError("Error ao criar o token de verificação", 400);
-      console.log("auth/services/service.auth.ts/createTokenUser", auth)
       return auth;
     } catch {
       throw new AppError(

@@ -1,8 +1,10 @@
-
-const urlFrontEnd = ""
-
-export function resetPasswordEmailTemplate(name: string, resetLink: string) {
-  return `
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.resetPasswordEmailTemplate = resetPasswordEmailTemplate;
+exports.createContaEmailTemplate = createContaEmailTemplate;
+const urlFrontEnd = "";
+function resetPasswordEmailTemplate(name, resetLink) {
+    return `
   <!DOCTYPE html>
   <html>
     <head>
@@ -61,9 +63,8 @@ export function resetPasswordEmailTemplate(name: string, resetLink: string) {
   </html>
   `;
 }
-
-export function createContaEmailTemplate(Link: string, token: string) {
-  return `
+function createContaEmailTemplate(name, Link, token) {
+    return `
   <!DOCTYPE html>
   <html>
     <head>
@@ -110,7 +111,7 @@ export function createContaEmailTemplate(Link: string, token: string) {
     <body>
       <div class="container">
       <h1>Bem vindo à streamigflix</h1>
-        
+        <p>Olá <b>${name}</b>,</p>
         <p>Recebemos uma solicitação para de criação de conta. Se foi você, clique no botão abaixo:</p>
         <a href="${urlFrontEnd}${Link}?token=${token}" class="button">criar conta</a>
         <p>Se você não solicitou a criação de conta, ignore este e-mail. Sua conta permanecerá segura.</p>

@@ -19,7 +19,7 @@ export async function sendEmail(
 ) {
       try {
     const info = await transporter.sendMail({
-      from: `"Minha Loja" <${process.env.EMAIL_USER}>`,
+      from: `"Tech Shop" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text,

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
-import { email_Verifications, users } from "../../../database/schema.database";
+import { email_verifications, users } from "../../../database/schema.database";
 import { AppError } from "../../../errors/AppErro";
 import { authInsert, emailVerification } from "../dtos/types.dto.auth";
 import crypto from "crypto"
@@ -20,11 +20,11 @@ export class AuthRepository {
     }
   }
   async emailVerificationCreate(
-    token: string, time: Date, user_Id: string
+    token: string, time: Date, user_id: string
   ): Promise<emailVerification | null> {
     try {
       const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-      const auth = await db.insert(email_Verifications).values({tokenHash, expires_At: time, user_Id}).returning();
+      const auth = await db.insert(email_verifications).values({tokenHash, expires_at: time, user_id}).returning();
       return auth[0] ?? null;
     } catch(err: any) {
       console.error("Erro ao salvar token:", err.message, err.stack);
@@ -51,8 +51,8 @@ export class AuthRepository {
     try {
       const auth = await db
         .select()
-        .from(email_Verifications)
-        .where(eq(email_Verifications.user_Id, userId));
+        .from(email_verifications)
+        .where(eq(email_verifications.user_id, userId));
       return auth[0] ?? null;
     } catch {
       throw new AppError(
@@ -100,12 +100,12 @@ export class AuthRepository {
       );
     }
   }
-  async updateAutetication(userId: string, expires_At: Date, consume_At: Date): Promise<emailVerification | null> {
+  async updateAutetication(userId: string, expires_at: Date, consumed_at: Date): Promise<emailVerification | null> {
  try {
       const auth = await db
-        .update(email_Verifications)
-        .set({expires_At, consume_At})
-        .where(eq(email_Verifications.user_Id, userId))
+        .update(email_verifications)
+        .set({expires_at, consumed_at})
+        .where(eq(email_verifications.user_id, userId))
         .returning();
       return auth[0] ?? null;
     } catch {
@@ -119,8 +119,8 @@ export class AuthRepository {
   async removeTokenUser(userId: string) {
     try {
       const auth = await db
-        .delete(email_Verifications)
-        .where(eq(email_Verifications.user_Id, userId))
+        .delete(email_verifications)
+        .where(eq(email_verifications.user_id, userId))
         .returning();
       return auth[0] ?? null;
     } catch {

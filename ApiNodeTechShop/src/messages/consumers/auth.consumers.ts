@@ -1,32 +1,59 @@
-// messages/consumers/auth.consumers.ts
-import { assertQueueWithDLQ, bindQueue, getSubscriberChannel } from "../rabbitmq";
+// auth.consumers.ts - MODIFICAR
+import { sendEmail } from "../../share/services/EmailService";
+import { createContaEmailTemplate } from "../../share/utils/EmailTemplate";
+import {
+  assertQueueWithDLQ,
+  bindQueue,
+  assertTopicExchange,
+} from "../rabbitmq";
+type verifyEventData = {
+  email: string;
+  token: string;
+  userId: string;
+};
 
 const EXCHANGE = "auth.events";
 const DLX = "auth.events.dlx";
-const QUEUE = "email.verification.send"; // fila do serviço de e-mail
+const QUEUE = "email.verification.send";
 const PATTERN = "auth.email.verification.requested";
 
 export async function startEmailVerificationConsumer() {
-  const ch = await assertQueueWithDLQ(QUEUE, DLX);
-  await bindQueue(QUEUE, EXCHANGE, PATTERN);
-  await ch.prefetch(10);
+  try {
+    // ✅ 1. Primeiro garantir que o exchange principal existe
+    await assertTopicExchange(EXCHANGE);
 
-  console.log(`👂 Aguardando mensagens em: ${QUEUE} (pattern: ${PATTERN})`);
+    // ✅ 2. Configurar queue com DLQ
+    const ch = await assertQueueWithDLQ(QUEUE, DLX);
 
-  ch.consume(QUEUE, async (msg) => {
-    if (!msg) return;
-    try {
-      const event = JSON.parse(msg.content.toString());
+    // ✅ 3. Agora fazer binding (a função bindQueue já declara o exchange)
+    await bindQueue(QUEUE, EXCHANGE, PATTERN);
 
-      // TODO: validar com Zod (ex.: verificar campos obrigatórios)
-      // await sendEmail(event.email, buildVerificationTemplate(event.token))
+    await ch.prefetch(10);
+    console.log(`👂 Aguardando mensagens em: ${QUEUE} (pattern: ${PATTERN})`);
 
-      ch.ack(msg);
-      console.log("✅ E-mail de verificação enviado:", event.email);
-    } catch (err) {
-      console.error("❌ Falha ao processar:", err);
-      // Nack sem requeue — deixa o DLX/TTL cuidar de retentativa/park
-      ch.nack(msg, false, false);
-    }
-  });
+    ch.consume(QUEUE, async (msg) => {
+      if (!msg) return;
+      try {
+        const event = JSON.parse(msg.content.toString()) as verifyEventData;
+        if (!event.email || !event.token || !event.userId) {
+          throw new Error(
+            "Dados do evento incompletos");
+        }
+
+        await sendEmail(
+          event.email,
+          "/signup",
+          createContaEmailTemplate(`http://localhost:3000/verify-email?token=${event.token}&userId=${event.userId}`, event.token)
+        );
+        ch.ack(msg);
+        console.log("✅ E-mail de verificação enviado:", event.email);
+      } catch (err) {
+        console.error("❌ Falha ao processar:", err);
+        ch.ack(msg, false);
+      }
+    });
+  } catch (error) {
+    console.error("❌ Falha ao iniciar consumer:", error);
+    throw error;
+  }
 }

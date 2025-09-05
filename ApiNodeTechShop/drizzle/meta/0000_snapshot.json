@@ -1,5 +1,5 @@
 {
-  "id": "7b6e52e4-71cb-4d6d-9f93-59a273b63384",
+  "id": "8551375d-068a-4725-b06a-c36d29a56b89",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -19,7 +19,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "product_id": {
           "name": "product_id",
@@ -34,12 +34,12 @@
           "notNull": true,
           "default": 0
         },
-        "datatime": {
-          "name": "datatime",
-          "type": "timestamp",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": true,
+          "default": "NOW()"
         }
       },
       "indexes": {},
@@ -54,7 +54,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "carts_product_id_products_id_fk": {
@@ -92,7 +92,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "tokenHash": {
           "name": "tokenHash",
@@ -100,17 +100,17 @@
           "primaryKey": false,
           "notNull": true
         },
-        "exipres_At": {
-          "name": "exipres_At",
+        "expires_at": {
+          "name": "expires_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
         },
-        "consumer_At": {
-          "name": "consumer_At",
+        "consumed_at": {
+          "name": "consumed_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -157,7 +157,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "product_id": {
           "name": "product_id",
@@ -172,12 +172,12 @@
           "notNull": true,
           "default": 0
         },
-        "datatime": {
-          "name": "datatime",
-          "type": "timestamp",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": true,
+          "default": "NOW()"
         }
       },
       "indexes": {},
@@ -192,7 +192,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "orders_product_id_products_id_fk": {
