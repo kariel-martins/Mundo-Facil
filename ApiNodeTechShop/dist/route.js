@@ -8,3 +8,4 @@ const router = (0, express_1.Router)();
 exports.router = router;
 router.get("/", (_req, res) => { res.status(200).json({ message: "servidor rodando" }); });
 router.post("/signUp", schemas_dto_1.validateSigUp, controller_auth_1.signUp);
+router.get("/verify-email", controller_auth_1.verifyEmail);

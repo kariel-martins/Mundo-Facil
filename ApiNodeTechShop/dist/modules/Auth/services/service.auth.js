@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = exports.AuthTokenService = void 0;
 const AppErro_1 = require("../../../errors/AppErro");
 const auth_producers_1 = require("../../../messages/producers/auth.producers");
+const CryptoService_1 = require("../../../share/services/CryptoService");
 const JWTService_1 = require("../../../share/services/JWTService");
-const PasswordCrypto_1 = require("../../../share/services/PasswordCrypto");
 const auth_repository_1 = require("../repositories/auth.repository");
 class AuthTokenService {
     jwtService = new JWTService_1.JWTService();
@@ -24,7 +24,8 @@ class AuthTokenService {
             const authToken = await this.jwtService.verify(token);
             if (!authToken ||
                 authToken === "JWT_SECRET_NOT_FOUND" ||
-                authToken === "INVALID_TOKEN")
+                authToken === "INVALID_TOKEN" ||
+                authToken === "ERRO_TOKEN_VERIFY")
                 throw new AppErro_1.AppError("Erro ao verificar o token", 400);
             return authToken;
         }
@@ -37,6 +38,7 @@ exports.AuthTokenService = AuthTokenService;
 class AuthService {
     repo = new auth_repository_1.AuthRepository();
     tokenService = new AuthTokenService();
+    Crypto = new CryptoService_1.CryptoService();
     async registerUser(data) {
         try {
             await this.getByEmail(data.email);
@@ -45,7 +47,7 @@ class AuthService {
         catch {
             try {
                 // criar o usuário
-                const passwordHash = await PasswordCrypto_1.passwordCrypto.hashText(data.password);
+                const passwordHash = await this.Crypto.hashText(data.password);
                 const auth = await this.repo.create({ ...data, passwordHash });
                 if (!auth)
                     throw new AppErro_1.AppError("Error ao criar o usuário", 400);
@@ -54,7 +56,8 @@ class AuthService {
                 if (!uid)
                     throw new AppErro_1.AppError("Id Não encotrado!");
                 const token = await this.tokenService.signToken(uid, 15);
-                const userToken = await this.createTokenUser(token, 15, uid);
+                const tokenHash = await this.Crypto.hashText(token);
+                const userToken = await this.createTokenUser(tokenHash, 15, uid);
                 // Publicar eventos
                 await (0, auth_producers_1.publishUserCreated)({
                     id: uid,
@@ -64,7 +67,7 @@ class AuthService {
                 await (0, auth_producers_1.publishEmailVerificationRequested)({
                     userId: uid,
                     email: auth.email,
-                    token: userToken.tokenHash,
+                    token: token,
                     expiresAt: userToken.expires_at.toISOString(),
                 });
                 return auth;
@@ -100,16 +103,18 @@ class AuthService {
             throw new AppErro_1.AppError("Usuário não encontrado", 500, "auth/services/service.auth.ts/getByEmail");
         }
     }
-    async getByIdTokenVerication(userId) {
-        try {
-            const auth = await this.repo.findTokenVerication(userId);
-            if (!auth)
-                throw new AppErro_1.AppError("Token não encontrado", 404);
-            return auth;
-        }
-        catch {
-            throw new AppErro_1.AppError("Token não encontrado", 500, "auth/services/service.auth.ts/getByIdTokenVerication");
-        }
+    async getByIdTokenVerication(user_id, token) {
+        const tokenHash = await this.repo.findByIdTokenVerication(user_id);
+        if (!tokenHash)
+            throw new AppErro_1.AppError("Usuário não encotrado", 404);
+        const tokenVericate = await this.Crypto.verifyText(token, tokenHash.tokenHash);
+        console.log(tokenHash.tokenHash, "foi", token);
+        if (!tokenVericate)
+            throw new AppErro_1.AppError("Token inválido", 404);
+        const auth = await this.repo.findByIdTokenVerication(user_id);
+        if (!auth)
+            throw new AppErro_1.AppError("Token não encontrado", 404);
+        return auth;
     }
     async UpdatePasswordUser(email, password) {
         try {
@@ -124,7 +129,7 @@ class AuthService {
     }
     async UpdateUser(email, email_verified_at, status) {
         try {
-            const auth = await this.repo.updateUser(email, email_verified_at, status);
+            const auth = await this.repo.updateAutenticationUser(email, email_verified_at, status);
             if (!auth)
                 throw new AppErro_1.AppError("Error ao atualizar o usuário", 400);
             return auth;
@@ -133,12 +138,15 @@ class AuthService {
             throw new AppErro_1.AppError("Error ao atualizar o usuário", 500, "auth/services/service.auth.ts/UpdatePasswordUser");
         }
     }
-    async updateAutetication(userId, expiresAt, consumeAt) {
+    async updateAutetication(user_id) {
         try {
-            const auth = await this.repo.updateAutetication(userId, expiresAt, consumeAt);
-            if (!auth)
+            const verifyTokenUpdate = await this.repo.updateAuteticationToken(user_id);
+            if (!verifyTokenUpdate)
                 throw new AppErro_1.AppError("Error ao atualizar o token de verificação", 400);
-            return auth;
+            const updatedUser = await this.repo.updateAutenticationUser(user_id, new Date(), "ativo");
+            if (!updatedUser)
+                throw new AppErro_1.AppError("Error ao atualizar a autorização de usuário");
+            return updatedUser;
         }
         catch {
             throw new AppErro_1.AppError("Error ao atualizar o token de verificação", 500, "auth/services/service.auth.ts/updateAutetication");

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../../database/client.database";
 import { email_verifications, users } from "../../../database/schema.database";
 import { AppError } from "../../../errors/AppErro";
@@ -20,10 +20,9 @@ export class AuthRepository {
     }
   }
   async emailVerificationCreate(
-    token: string, time: Date, user_id: string
+    tokenHash: string, time: Date, user_id: string
   ): Promise<emailVerification | null> {
     try {
-      const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
       const auth = await db.insert(email_verifications).values({tokenHash, expires_at: time, user_id}).returning();
       return auth[0] ?? null;
     } catch(err: any) {
@@ -47,12 +46,12 @@ export class AuthRepository {
       );
     }
   }
-  async findTokenVerication(userId: string): Promise<emailVerification | null> {
+  async findByIdTokenVerication(user_id: string): Promise<emailVerification | null> {
     try {
       const auth = await db
         .select()
         .from(email_verifications)
-        .where(eq(email_verifications.user_id, userId));
+        .where(eq(email_verifications.user_id, user_id));
       return auth[0] ?? null;
     } catch {
       throw new AppError(
@@ -81,15 +80,15 @@ export class AuthRepository {
       );
     }
   }
-  async updateUser(
-    email: string,
+  async updateAutenticationUser(
+    user_id: string,
     email_verified_at: Date, status: string
   ): Promise<authInsert | null> {
     try {
       const auth = await db
         .update(users)
         .set({ email_verified_at, status})
-        .where(eq(users.email, email))
+        .where(eq(users.id, user_id))
         .returning();
       return auth[0] ?? null;
     } catch {
@@ -100,12 +99,12 @@ export class AuthRepository {
       );
     }
   }
-  async updateAutetication(userId: string, expires_at: Date, consumed_at: Date): Promise<emailVerification | null> {
+  async updateAuteticationToken(user_id: string): Promise<emailVerification | null> {
  try {
       const auth = await db
         .update(email_verifications)
-        .set({expires_at, consumed_at})
-        .where(eq(email_verifications.user_id, userId))
+        .set({consumed_at: new Date()})
+        .where(and(eq(email_verifications.user_id, user_id), isNull(email_verifications.consumed_at)))
         .returning();
       return auth[0] ?? null;
     } catch {

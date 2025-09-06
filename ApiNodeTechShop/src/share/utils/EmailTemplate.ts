@@ -1,5 +1,6 @@
+import { env } from "../../config/env";
 
-const urlFrontEnd = ""
+const { urlFrontEnd } = env()
 
 export function resetPasswordEmailTemplate(name: string, resetLink: string) {
   return `
@@ -62,7 +63,7 @@ export function resetPasswordEmailTemplate(name: string, resetLink: string) {
   `;
 }
 
-export function createContaEmailTemplate(Link: string, token: string) {
+export function createContaEmailTemplate(link: string, token: string, user_id:string) {
   return `
   <!DOCTYPE html>
   <html>
@@ -70,53 +71,78 @@ export function createContaEmailTemplate(Link: string, token: string) {
       <meta charset="utf-8" />
       <style>
         body {
-          font-family: Arial, sans-serif;
-          background-color: #f9fafb;
+          font-family: 'Segoe UI', Arial, sans-serif;
+          background-color: #f3f4f6;
           margin: 0;
-          padding: 20px;
+          padding: 40px 20px;
           color: #111827;
         }
         .container {
           max-width: 600px;
           margin: auto;
-          background: white;
-          padding: 30px;
-          border-radius: 12px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+          background: #ffffff;
+          padding: 40px 30px;
+          border-radius: 16px;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.08);
         }
-        h1 {
-          font-size: 20px;
-          color: #1f2937;
+        .header {
+          text-align: center;
+          padding-bottom: 20px;
+          border-bottom: 1px solid #e5e7eb;
         }
-        p {
-          font-size: 16px;
-          line-height: 1.6;
+        .header h1 {
+          font-size: 22px;
+          color: #111827;
+          margin: 0;
+        }
+        .content {
+          margin-top: 20px;
+        }
+        .content p {
+          font-size: 15px;
+          line-height: 1.7;
+          margin: 10px 0;
+          color: #374151;
         }
         a.button {
           display: inline-block;
-          padding: 12px 20px;
-          margin-top: 20px;
-          background-color: #3b82f6;
-          color: white;
+          padding: 14px 28px;
+          margin: 25px 0;
+          background-color: #2563eb;
+          color: #ffffff !important;
           text-decoration: none;
-          border-radius: 8px;
+          border-radius: 10px;
           font-weight: bold;
+          transition: background 0.3s ease;
         }
         a.button:hover {
-          background-color: #2563eb;
+          background-color: #1e40af;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 12px;
+          color: #6b7280;
+          text-align: center;
+          border-top: 1px solid #e5e7eb;
+          padding-top: 20px;
         }
       </style>
     </head>
     <body>
       <div class="container">
-      <h1>Bem vindo à streamigflix</h1>
-        
-        <p>Recebemos uma solicitação para de criação de conta. Se foi você, clique no botão abaixo:</p>
-        <a href="${urlFrontEnd}${Link}?token=${token}" class="button">criar conta</a>
-        <p>Se você não solicitou a criação de conta, ignore este e-mail. Sua conta permanecerá segura.</p>
-        <p style="font-size: 12px; color: #6b7280;">
-          Este link expira em 15 minutos.
-        </p>
+        <div class="header">
+          <h1>Tech Shop</h1>
+        </div>
+        <div class="content">
+          <p>Olá,</p>
+          <p>Você solicitou a criação de uma conta na <strong>Tech Shop</strong>. Para confirmar e ativar sua conta, clique no botão abaixo:</p>
+          <a href="${urlFrontEnd}${link}?token=${token}&user_id=${user_id}" class="button">Ativar Conta</a>
+          <p>Se você não fez esta solicitação, pode simplesmente ignorar este e-mail. Sua conta permanecerá segura.</p>
+          <p><strong>Importante:</strong> este link expira em <strong>15 minutos</strong>.</p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} Tech Shop. Todos os direitos reservados.</p>
+        </div>
       </div>
     </body>
   </html>

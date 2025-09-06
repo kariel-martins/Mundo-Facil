@@ -22,12 +22,45 @@ const signUp = async (req, res) => {
     }
 };
 exports.signUp = signUp;
-const verifyEmail = (req, res) => {
-    const token = req.cookies["verifyEmail"];
-    if (!token) {
-        res.status(401).json({ errors: { default: "Token não encotrado." } });
+const verifyEmail = async (req, res) => {
+    const { user_id, token } = req.query;
+    if (!user_id ||
+        !token ||
+        typeof token !== "string" ||
+        typeof user_id !== "string") {
+        res
+            .status(401)
+            .json({ errors: { default: "Token e user_id não são válidos" } });
         return;
     }
+    const verification = await service.getByIdTokenVerication(user_id, token);
+    if (!verification) {
+        res.status(404).json({
+            errors: {
+                default: "Verificação não encontrada ou já usada",
+            },
+        });
+        return;
+    }
+    if (new Date() > verification.expires_at) {
+        res.status(400).json({
+            errors: {
+                default: "Token expirado",
+            },
+        });
+        return;
+    }
+    const uid = verification.user_id;
+    if (!uid) {
+        res.status(404).json({
+            errors: {
+                default: "Usuário não encotrado",
+            },
+        });
+        return;
+    }
+    const updateAuteticationUser = await service.updateAutetication(uid);
+    res.status(201).json({ updateAuteticationUser });
 };
 exports.verifyEmail = verifyEmail;
 const sigIn = (req, res) => { };

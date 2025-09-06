@@ -42,8 +42,8 @@ export async function startEmailVerificationConsumer() {
 
         await sendEmail(
           event.email,
-          "/signup",
-          createContaEmailTemplate(`http://localhost:3000/verify-email?token=${event.token}&userId=${event.userId}`, event.token)
+          "Create Account",
+          createContaEmailTemplate("/verify-email", event.token, event.userId)
         );
         ch.ack(msg);
         console.log("✅ E-mail de verificação enviado:", event.email);
