@@ -98,7 +98,7 @@ export async function publish(
 
   const payload = Buffer.from(JSON.stringify(message));
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>((resolve) => {
     const ok = ch.publish(exchange, routingKey, payload, {
       persistent: true,
       contentType: "application/json",

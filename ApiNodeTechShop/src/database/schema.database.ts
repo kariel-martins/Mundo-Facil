@@ -1,5 +1,12 @@
 import { sql } from "drizzle-orm";
-import { text, timestamp, varchar, integer, uuid, pgTable } from "drizzle-orm/pg-core";
+import {
+  text,
+  timestamp,
+  varchar,
+  integer,
+  uuid,
+  pgTable,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid().primaryKey().notNull().defaultRandom(),
@@ -15,7 +22,7 @@ export const users = pgTable("users", {
 
 export const email_verifications = pgTable("email_verifications", {
   id: uuid().primaryKey().notNull().defaultRandom(),
-  user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   tokenHash: text().notNull(),
   expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
   consumed_at: timestamp("consumed_at", { withTimezone: true }),
@@ -24,17 +31,31 @@ export const email_verifications = pgTable("email_verifications", {
     .default(sql`NOW()`),
 });
 
-export const products = pgTable("products", {
+export const stores = pgTable("stores", { 
   id: uuid().primaryKey().notNull().defaultRandom(),
-  name: text().notNull(),
-  estoque: integer().notNull().default(0),
+  boss_id: uuid("boss_id").references(()=> users.id, {onDelete: "cascade"}).notNull(),
+  storeName: text().unique().notNull(),
+  email: text().unique().notNull(),
+  created_at: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`NOW()`),
+})
+
+export const products = pgTable("products", {
+  id: uuid().primaryKey().defaultRandom().notNull(),
+  store_id: uuid("store_id").references(()=> stores.id, {onDelete: "cascade"}).notNull(),
+  productName: text().notNull(),
+  price: integer().default(0).notNull(),
+  estoque: integer().default(0).notNull(),
   image: text().notNull(),
-  price: integer().default(0),
+  created_at: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`NOW()`),
 });
 
 export const carts = pgTable("carts", {
   id: uuid().primaryKey().notNull().defaultRandom(),
-  user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   product_id: uuid("product_id")
     .notNull()
     .references(() => products.id),
@@ -46,7 +67,8 @@ export const carts = pgTable("carts", {
 
 export const orders = pgTable("orders", {
   id: uuid().primaryKey().notNull().defaultRandom(),
-  user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  store_id: uuid("store_id").references(() => stores.id, { onDelete: "cascade" }).notNull(),
   product_id: uuid("product_id")
     .notNull()
     .references(() => products.id),

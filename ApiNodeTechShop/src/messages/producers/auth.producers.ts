@@ -15,7 +15,11 @@ type UserCreatedEvent = {
   };
 };
 
-export async function publishUserCreated(user: { id: string; name: string; email: string }) {
+export async function publishUserCreated(user: {
+  id: string;
+  name: string;
+  email: string;
+}) {
   const event: UserCreatedEvent = {
     eventId: crypto.randomUUID(),
     occurredAt: new Date().toISOString(),
@@ -54,4 +58,34 @@ export async function publishEmailVerificationRequested(data: {
     headers: { "x-service": "auth" },
   });
   console.log("📨 Evento publicado: auth.email.verification.requested", event);
+}
+
+export async function publishForgotPasswordEmail(
+  email: string,
+  token: string,
+  name: string
+) {
+  const event = {
+    email,
+    token,
+    name,
+  };
+  await publish(EXCHANGE, "auth.forgot.password.requested", event, {headers: {"x-service": "auth"}});
+  console.log("📨 Evento publicado: auth.forgot.password.requested", event, {
+    headers: { "x-service": "auth" },
+  });
+}
+
+export async function publishResertPasswordUser(
+  email: string,
+  name: string
+) {
+  const event = {
+    email,
+    name,
+  };
+  await publish(EXCHANGE, "auth.resert.password.requested", event, {
+    headers: { "x-service": "auth" },
+  });
+  console.log("📨  Evento publicado: auth.resert.password.requested", event);
 }

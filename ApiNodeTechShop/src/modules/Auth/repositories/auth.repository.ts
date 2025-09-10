@@ -3,131 +3,149 @@ import { db } from "../../../database/client.database";
 import { email_verifications, users } from "../../../database/schema.database";
 import { AppError } from "../../../errors/AppErro";
 import { authInsert, emailVerification } from "../dtos/types.dto.auth";
-import crypto from "crypto"
 
 export class AuthRepository {
-  async create(data: authInsert): Promise<authInsert | null> {
+  // helper para centralizar erros
+  private async execute<T>(
+    fn: () => Promise<T | undefined>,
+    message: string,
+    context: string
+  ): Promise<T> {
     try {
-      const auth = await db.insert(users).values(data).returning();
-      return auth[0] ?? null;
-    } catch (err) {
-      console.error(err)
-      throw new AppError(
-        "Error ao criar o usuáiro",
-        500,
-        "aut/repositeries/auth.repository.ts/create"
-      );
+      const result = await fn();
+      if (!result) {
+        throw new AppError(message, 404, context);
+      } 
+      return result;
+    } catch (error: any) {
+      console.error(`Erro em ${context}:`, error?.message, error?.stack);
+      if (error instanceof AppError) throw error;
+      throw new AppError(message, 500, context);
     }
   }
+
+  async create(data: authInsert): Promise<authInsert> {
+    return this.execute(
+      async () => {
+        const result = await db.insert(users).values(data).returning();
+        return result[0];
+      },
+      "Erro ao criar o usuário",
+      "auth/repositories/auth.repository.ts/create"
+    );
+  }
+
   async emailVerificationCreate(
-    tokenHash: string, time: Date, user_id: string
-  ): Promise<emailVerification | null> {
-    try {
-      const auth = await db.insert(email_verifications).values({tokenHash, expires_at: time, user_id}).returning();
-      return auth[0] ?? null;
-    } catch(err: any) {
-      console.error("Erro ao salvar token:", err.message, err.stack);
-      throw new AppError(
-        "Error ao criar token de verificação",
-        500,
-        "aut/repositeries/auth.repository.ts/emailVerificationCreate"
-      );
-    }
+    tokenHash: string,
+    expires_at: Date,
+    user_id: string
+  ): Promise<emailVerification> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .insert(email_verifications)
+          .values({ tokenHash, expires_at, user_id })
+          .returning();
+        return result[0];
+      },
+      "Erro ao criar token de verificação",
+      "auth/repositories/auth.repository.ts/emailVerificationCreate"
+    );
   }
-  async findByEmail(email: string): Promise<authInsert | null> {
-    try {
-      const auth = await db.select().from(users).where(eq(users.email, email));
-      return auth[0] ?? null;
-    } catch {
-      throw new AppError(
-        "Error ao busca o usuário",
-        500,
-        "aut/repositeries/auth.repository.ts/findByEmail"
-      );
-    }
+
+  async findByEmail(email: string, status: string): Promise<authInsert> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .select()
+          .from(users)
+          .where(and(eq(users.email, email), eq(users.status, status)));
+        return result[0];
+      },
+      "Usuário não encontrado",
+      "auth/repositories/auth.repository.ts/findByEmail"
+    );
   }
-  async findByIdTokenVerication(user_id: string): Promise<emailVerification | null> {
-    try {
-      const auth = await db
-        .select()
-        .from(email_verifications)
-        .where(eq(email_verifications.user_id, user_id));
-      return auth[0] ?? null;
-    } catch {
-      throw new AppError(
-        "Error ao busca o token de verificação",
-        500,
-        "aut/repositeries/auth.repository.ts/findTokenVerication"
-      );
-    }
+
+  async findByIdTokenVerification(user_id: string): Promise<emailVerification> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .select()
+          .from(email_verifications)
+          .where(eq(email_verifications.user_id, user_id));
+        return result[0];
+      },
+      "Token de verificação não encontrado",
+      "auth/repositories/auth.repository.ts/findByIdTokenVerification"
+    );
   }
-  async updatePassword(
-    email: string,
-    passwordHash: string
-  ): Promise<authInsert | null> {
-    try {
-      const auth = await db
-        .update(users)
-        .set({ passwordHash })
-        .where(eq(users.email, email))
-        .returning();
-      return auth[0] ?? null;
-    } catch {
-      throw new AppError(
-        "Error ao atualizar a senha do usuário",
-        500,
-        "auth/auth.repositories.ts/updatePassword"
-      );
-    }
+
+  async updatePassword(email: string, passwordHash: string): Promise<authInsert> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .update(users)
+          .set({ passwordHash })
+          .where(eq(users.email, email))
+          .returning();
+        return result[0];
+      },
+      "Erro ao atualizar senha do usuário",
+      "auth/repositories/auth.repository.ts/updatePassword"
+    );
   }
-  async updateAutenticationUser(
+
+  async updateAuthenticationUser(
     user_id: string,
-    email_verified_at: Date, status: string
-  ): Promise<authInsert | null> {
-    try {
-      const auth = await db
-        .update(users)
-        .set({ email_verified_at, status})
-        .where(eq(users.id, user_id))
-        .returning();
-      return auth[0] ?? null;
-    } catch {
-      throw new AppError(
-        "Error ao autalizar o usuário",
-        500,
-        "auth/auth.repositories.ts/updatePassword"
-      );
-    }
+    email_verified_at: Date,
+    status: string
+  ): Promise<authInsert> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .update(users)
+          .set({ email_verified_at, status })
+          .where(eq(users.id, user_id))
+          .returning();
+        return result[0];
+      },
+      "Erro ao atualizar autenticação do usuário",
+      "auth/repositories/auth.repository.ts/updateAuthenticationUser"
+    );
   }
-  async updateAuteticationToken(user_id: string): Promise<emailVerification | null> {
- try {
-      const auth = await db
-        .update(email_verifications)
-        .set({consumed_at: new Date()})
-        .where(and(eq(email_verifications.user_id, user_id), isNull(email_verifications.consumed_at)))
-        .returning();
-      return auth[0] ?? null;
-    } catch {
-      throw new AppError(
-        "Error ao autalizar o usuário",
-        500,
-        "auth/auth.repositories.ts/updatePassword"
-      );
-    }
+
+  async updateAuthenticationToken(user_id: string): Promise<emailVerification> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .update(email_verifications)
+          .set({ consumed_at: new Date() })
+          .where(
+            and(
+              eq(email_verifications.user_id, user_id),
+              isNull(email_verifications.consumed_at)
+            )
+          )
+          .returning();
+        return result[0];
+      },
+      "Erro ao atualizar token de autenticação",
+      "auth/repositories/auth.repository.ts/updateAuthenticationToken"
+    );
   }
-  async removeTokenUser(userId: string) {
-    try {
-      const auth = await db
-        .delete(email_verifications)
-        .where(eq(email_verifications.user_id, userId))
-        .returning();
-      return auth[0] ?? null;
-    } catch {
-      throw new AppError(
-        "Erro ao remove token de verificação",
-        500,
-        "auth/auth.repositories.ts/removeTokenUser"
-      );
-    }
+
+  async removeTokenUser(userId: string): Promise<emailVerification> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .delete(email_verifications)
+          .where(eq(email_verifications.user_id, userId))
+          .returning();
+        return result[0];
+      },
+      "Erro ao remover token de verificação",
+      "auth/repositories/auth.repository.ts/removeTokenUser"
+    );
   }
 }
