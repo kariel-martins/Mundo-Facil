@@ -13,7 +13,7 @@ async function bootstrap() {
   await startEmailVerificationConsumer();
   await startForgotPasswordConsumer();
   await startResertPasswordConsumer();
-  await startCreateStoreRequest()
+  await startCreateStoreRequest();
 
   await app.listen(dataEnv.port, () => {
     console.log("servido rodando!!!");

@@ -21,7 +21,7 @@ type SafeUser = Omit<authInsert, "passwordHash">;
 
 export class AuthService {
   private repo = new AuthRepository();
-  private tokenService = new JWTService()
+  private tokenService = new JWTService();
   private crypto = new CryptoService();
 
   // helper para padronizar tratamento de erros
@@ -43,8 +43,10 @@ export class AuthService {
     return this.execute(
       async () => {
         // impede duplicidade
-        const existing = await this.repo.findByEmail(data.email, "ativo");
-        if (existing) throw new AppError("Email já existe", 409);
+        try {
+          const existing = await this.repo.findByEmail(data.email, "ativo");
+          if (existing) throw new AppError("Email já existe", 409);
+        } catch {}
 
         // cria usuário
         const passwordHash = await this.crypto.hashText(data.password);
@@ -108,8 +110,7 @@ export class AuthService {
         if (!user || !user.id)
           throw new AppError("Usuário ou Id não encontrado", 404);
 
-        const resetId = crypto.randomUUID();
-        const token = await this.tokenService.signToken(resetId, 15);
+        const token = await this.tokenService.signToken(user.email, 15);
         const tokenHash = await this.crypto.hashText(token);
         await this.createTokenUser(tokenHash, 15, user.id);
 

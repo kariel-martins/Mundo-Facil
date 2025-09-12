@@ -1,12 +1,12 @@
 import { AppError } from "../../../errors/AppErro";
 import { publishCreateProductRequest } from "../../../messages/producers/product.producers";
-import { ProductInsert, productStore } from "../dtos/types.dto.product";
+import { Product, ProductInsert, ProductUpdate, productStore } from "../dtos/types.dto.product";
 import { ProductRepository } from "../repositories/repository.product";
 
 export class ProductService {
   private repo = new ProductRepository();
 
-  // helper para padronizar tratamento de erros
+  // Helper para padronizar tratamento de erros
   private async execute<T>(
     fn: () => Promise<T>,
     message: string,
@@ -21,65 +21,61 @@ export class ProductService {
     }
   }
 
-  public async createProduct(data: ProductInsert): Promise<productStore> {
-    return this.execute(async () => {
-      const product = await this.repo.create(data);
-      if (!product.stores.storeName || !product.stores.email || !product.products.id || !product.products.productName || !product.products.image || !product.products.price) throw new AppError("Erro ao criar o Produto", 400);
-      await publishCreateProductRequest({
-        email: product.stores.email,
-        product_id: product.products.id,
-        price: product.products.price,
-        productName: product.products.productName,
-        image: product.products.image,
-        storeName: product.stores.storeName
-    })
-      return product;
-    }, "Erro ao criar o produto",
-    "products/services/service.product.ts/createProduct"
-);
+  // Método auxiliar para notificação
+  private async notifyProductCreated(product: productStore): Promise<void> {
+    await publishCreateProductRequest({
+      email: product.stores.email,
+      product_id: product.products.id,
+      price: product.products.price,
+      productName: product.products.productName,
+      image: product.products.image,
+      storeName: product.stores.storeName,
+    });
   }
 
-   public async getByIdProduct(product_id:string): Promise<ProductInsert> {
-    return this.execute(
-      async ()=> {
-        const result = await this.repo.getById(product_id)
-        if (!result) throw new AppError("Produto não encotrado", 404)
-        return result
-      },"Erro ao buscar o produto",
-      "products/services/service.product.ts/getByIdProduct"
-    )
-   }
+  public async create(store_id: string, data: ProductInsert): Promise<productStore> {
+    return this.execute(async () => {
+      const store = await this.repo.getStore(store_id);
+      if (!store) throw new AppError("Loja não encontrada", 404);
 
-   public async getAllProduct(): Promise<ProductInsert[]> {
-    return this.execute(
-      async ()=> {
-        const result = await this.repo.getAll()
-        if (!result) throw new AppError("Não há Produtos", 404)
-        return result
-      }, "Erro ao buscar produtos",
-       "products/services/service.product.ts/getAllProduct"
-    )
-   }
+      const product = await this.repo.create(data);
 
-   public async updateProduct(product_id: string, data: ProductInsert): Promise<ProductInsert> {
-    return this.execute(
-      async ()=> {
-        const result = await this.repo.update(product_id, data)
-      if (!result) throw new AppError("Não foi possível atualizar o produto", 400)
-        return result
-      }, "Erro ao atualizar o produto",
-    "products/services/service.product.ts/updateProduct"
-    )
-   }
+      // dispara evento de criação de produto
+      await this.notifyProductCreated(product);
 
-   public async deleteProduct(product_id: string): Promise<ProductInsert> {
-    return this.execute(
-      async ()=> {
-        const result = await this.repo.delete(product_id)
-        if (!result) throw new AppError("Não foi possível deletar o produto")
-        return result
-      }, "Erro ao deletar o produto",
-      "products/services/service.product.ts/deleteProduct"
-    )
-   }
+      return product;
+    }, "Erro ao criar produto", "products/services/product.service.ts/create");
+  }
+
+  public async getById(product_id: string): Promise<Product> {
+    return this.execute(async () => {
+      const result = await this.repo.getById(product_id);
+      if (!result) throw new AppError("Produto não encontrado", 404);
+      return result;
+    }, "Erro ao buscar produto", "products/services/product.service.ts/getById");
+  }
+
+  public async getAll(): Promise<Product[]> {
+    return this.execute(async () => {
+      const result = await this.repo.getAll();
+      // aqui não lança erro se não houver produtos → retorna []
+      return result;
+    }, "Erro ao buscar produtos", "products/services/product.service.ts/getAll");
+  }
+
+  public async update(product_id: string, data: ProductUpdate): Promise<Product> {
+    return this.execute(async () => {
+      const result = await this.repo.update(product_id, data);
+      if (!result) throw new AppError("Produto não encontrado para atualização", 404);
+      return result;
+    }, "Erro ao atualizar produto", "products/services/product.service.ts/update");
+  }
+
+  public async delete(product_id: string): Promise<Product> {
+    return this.execute(async () => {
+      const result = await this.repo.delete(product_id);
+      if (!result) throw new AppError("Produto não encontrado para exclusão", 404);
+      return result;
+    }, "Erro ao deletar produto", "products/services/product.service.ts/delete");
+  }
 }

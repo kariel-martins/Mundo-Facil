@@ -81,18 +81,18 @@ export const forgotPassword: RequestHandler = async (req, res) => {
 
 export const resetPassword: RequestHandler = async (req, res) => {
   const { password, confirmPassword } = req.body;
-  const token = req.cookies["verifyUser"];
+  const { token } = req.query;
+  console.log(password, confirmPassword, token)
 
   if (!token || !password || !confirmPassword) {
     return res.status(400).json({ errors: { default: "Todos os campos são necessários" } });
   }
-
   if (password !== confirmPassword) {
     return res.status(400).json({ errors: { default: "As senhas não coincidem" } });
   }
 
   try {
-    const updatedUser = await service.resetPassword(token, password);
+    const updatedUser = await service.resetPassword(token.toString(), password);
     return res.status(200).json({ updatedUser });
   } catch (error) {
     return res.status(500).json({ errors: { default: "Erro ao redefinir senha" } });

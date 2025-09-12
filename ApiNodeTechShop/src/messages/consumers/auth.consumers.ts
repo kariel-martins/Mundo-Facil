@@ -60,7 +60,7 @@ export async function startEmailVerificationConsumer() {
         await sendEmail(
           event.email,
           "Create Account",
-          createContaEmailTemplate("/verify-email", event.token, event.userId)
+          createContaEmailTemplate("/auth/verify-email", event.token, event.userId)
         );
         ch.ack(msg);
         console.log("✅ E-mail de verificação enviado:", event.email);
@@ -86,7 +86,7 @@ export async function startForgotPasswordConsumer() {
     await bindQueue(FORGOT_PASSWORD_QUEUE, EXCHANGE, FORGOT_PASSWORD_PATTERN);
     await ch.prefetch(10);
 
-    console.log(`👂 Aguardando mensagens em: ${FORGOT_PASSWORD_QUEUE}`);
+    console.log(`👂 Aguardando mensagens em: ${FORGOT_PASSWORD_QUEUE} (pattern: ${EMAIL_VERIFICATION_PATTERN}`);
 
     ch.consume(FORGOT_PASSWORD_QUEUE, async (msg) => {
       if (!msg) return;
@@ -101,7 +101,7 @@ export async function startForgotPasswordConsumer() {
           "Forgot Password",
           resetPasswordEmailTemplate(
             event.name,
-            "/resert-password",
+            "/auth/resert-password",
             event.token
           )
         );
@@ -119,8 +119,8 @@ export async function startForgotPasswordConsumer() {
 }
 
 //================ Resert Password =======================
-const RESERT_PASSWORD_QUEUE = "email.forgot.password.send";
-const RESERT_PASSWORD_PATTERN = "auth.resert.password.requested";
+const RESERT_PASSWORD_QUEUE = "email.reset.password.send";
+const RESERT_PASSWORD_PATTERN = "auth.reset.password.requested";
 
 export async function startResertPasswordConsumer() {
   try {
@@ -129,7 +129,7 @@ export async function startResertPasswordConsumer() {
     await bindQueue(RESERT_PASSWORD_QUEUE, EXCHANGE, RESERT_PASSWORD_PATTERN);
     await ch.prefetch(10);
 
-    console.log(`👂 Aguardando mensagens em: ${RESERT_PASSWORD_QUEUE}`);
+    console.log(`👂 Aguardando mensagens em: ${RESERT_PASSWORD_QUEUE} (pattern: ${EMAIL_VERIFICATION_PATTERN}`);
 
     ch.consume(RESERT_PASSWORD_QUEUE, async (msg) => {
       if (!msg) return;

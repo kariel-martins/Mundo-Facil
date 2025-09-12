@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.orders = exports.carts = exports.products = exports.email_verifications = exports.users = void 0;
+exports.orders = exports.carts = exports.products = exports.stores = exports.email_verifications = exports.users = void 0;
 const drizzle_orm_1 = require("drizzle-orm");
 const pg_core_1 = require("drizzle-orm/pg-core");
 exports.users = (0, pg_core_1.pgTable)("users", {
@@ -16,7 +16,7 @@ exports.users = (0, pg_core_1.pgTable)("users", {
 });
 exports.email_verifications = (0, pg_core_1.pgTable)("email_verifications", {
     id: (0, pg_core_1.uuid)().primaryKey().notNull().defaultRandom(),
-    user_id: (0, pg_core_1.uuid)("user_id").references(() => exports.users.id, { onDelete: "cascade" }),
+    user_id: (0, pg_core_1.uuid)("user_id").references(() => exports.users.id, { onDelete: "cascade" }).notNull(),
     tokenHash: (0, pg_core_1.text)().notNull(),
     expires_at: (0, pg_core_1.timestamp)("expires_at", { withTimezone: true }).notNull(),
     consumed_at: (0, pg_core_1.timestamp)("consumed_at", { withTimezone: true }),
@@ -24,16 +24,29 @@ exports.email_verifications = (0, pg_core_1.pgTable)("email_verifications", {
         .notNull()
         .default((0, drizzle_orm_1.sql) `NOW()`),
 });
-exports.products = (0, pg_core_1.pgTable)("products", {
+exports.stores = (0, pg_core_1.pgTable)("stores", {
     id: (0, pg_core_1.uuid)().primaryKey().notNull().defaultRandom(),
-    name: (0, pg_core_1.text)().notNull(),
-    estoque: (0, pg_core_1.integer)().notNull().default(0),
+    boss_id: (0, pg_core_1.uuid)("boss_id").references(() => exports.users.id, { onDelete: "cascade" }).notNull(),
+    storeName: (0, pg_core_1.text)().unique().notNull(),
+    email: (0, pg_core_1.text)().unique().notNull(),
+    created_at: (0, pg_core_1.timestamp)("created_at", { withTimezone: true })
+        .notNull()
+        .default((0, drizzle_orm_1.sql) `NOW()`),
+});
+exports.products = (0, pg_core_1.pgTable)("products", {
+    id: (0, pg_core_1.uuid)().primaryKey().defaultRandom().notNull(),
+    store_id: (0, pg_core_1.uuid)("store_id").references(() => exports.stores.id, { onDelete: "cascade" }).notNull(),
+    productName: (0, pg_core_1.text)().notNull(),
+    price: (0, pg_core_1.integer)().default(0).notNull(),
+    estoque: (0, pg_core_1.integer)().default(0).notNull(),
     image: (0, pg_core_1.text)().notNull(),
-    price: (0, pg_core_1.integer)().default(0),
+    created_at: (0, pg_core_1.timestamp)("created_at", { withTimezone: true })
+        .notNull()
+        .default((0, drizzle_orm_1.sql) `NOW()`),
 });
 exports.carts = (0, pg_core_1.pgTable)("carts", {
     id: (0, pg_core_1.uuid)().primaryKey().notNull().defaultRandom(),
-    user_id: (0, pg_core_1.uuid)("user_id").references(() => exports.users.id, { onDelete: "cascade" }),
+    user_id: (0, pg_core_1.uuid)("user_id").references(() => exports.users.id, { onDelete: "cascade" }).notNull(),
     product_id: (0, pg_core_1.uuid)("product_id")
         .notNull()
         .references(() => exports.products.id),
@@ -44,7 +57,8 @@ exports.carts = (0, pg_core_1.pgTable)("carts", {
 });
 exports.orders = (0, pg_core_1.pgTable)("orders", {
     id: (0, pg_core_1.uuid)().primaryKey().notNull().defaultRandom(),
-    user_id: (0, pg_core_1.uuid)("user_id").references(() => exports.users.id, { onDelete: "cascade" }),
+    user_id: (0, pg_core_1.uuid)("user_id").references(() => exports.users.id, { onDelete: "cascade" }).notNull(),
+    store_id: (0, pg_core_1.uuid)("store_id").references(() => exports.stores.id, { onDelete: "cascade" }).notNull(),
     product_id: (0, pg_core_1.uuid)("product_id")
         .notNull()
         .references(() => exports.products.id),

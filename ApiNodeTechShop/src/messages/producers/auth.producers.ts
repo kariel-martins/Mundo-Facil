@@ -71,9 +71,7 @@ export async function publishForgotPasswordEmail(
     name,
   };
   await publish(EXCHANGE, "auth.forgot.password.requested", event, {headers: {"x-service": "auth"}});
-  console.log("📨 Evento publicado: auth.forgot.password.requested", event, {
-    headers: { "x-service": "auth" },
-  });
+  console.log("📨 Evento publicado: auth.forgot.password.requested", event);
 }
 
 export async function publishResertPasswordUser(
@@ -84,7 +82,7 @@ export async function publishResertPasswordUser(
     email,
     name,
   };
-  await publish(EXCHANGE, "auth.resert.password.requested", event, {
+  await publish(EXCHANGE, "auth.reset.password.requested", event, {
     headers: { "x-service": "auth" },
   });
   console.log("📨  Evento publicado: auth.resert.password.requested", event);

@@ -2,20 +2,23 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
 import { products, stores } from "../../../database/schema.database";
 import { AppError } from "../../../errors/AppErro";
-import { ProductInsert, productStore } from "../dtos/types.dto.product";
-
+import { Product, ProductInsert, ProductUpdate, productStore } from "../dtos/types.dto.product";
+import { Store } from "../../stores/dtos/store.types.store.dto";
 
 export class ProductRepository {
-  //helper para centralizer erros
+  // helper para centralizar erros
   private async execute<T>(
-    fn: () => Promise<T | undefined>,
+    fn: () => Promise<T>,
     message: string,
-    context: string
+    context: string,
+    allowEmpty = false
   ): Promise<T> {
     try {
       const result = await fn();
-      if (!result) {
-        throw new AppError(message, 404, context);
+      if (!result || (Array.isArray(result) && result.length === 0)) {
+        if (!allowEmpty) {
+          throw new AppError(message, 404, context);
+        }
       }
       return result;
     } catch (error: any) {
@@ -29,72 +32,83 @@ export class ProductRepository {
     return this.execute(
       async () => {
         const [newProduct] = await db.insert(products).values(data).returning();
-        const result = await db
+        const [result] = await db
           .select()
           .from(products)
           .innerJoin(stores, eq(products.store_id, stores.id))
           .where(eq(products.id, newProduct.id));
-        return result[0];
+        return result;
       },
-      "Erro ao criar Produto",
-      "auth/repositories/products.repository.ts/create"
+      "Erro ao criar produto",
+      "products/repositories/products.repository.ts/create"
     );
   }
 
-  public async getById(product_id: string): Promise<ProductInsert> {
+  public async getStore(store_id: string): Promise<Store> {
     return this.execute(
       async () => {
-        const result = await db
+        const [result] = await db
+          .select()
+          .from(stores)
+          .where(eq(stores.id, store_id));
+        return result;
+      },
+      "Erro ao buscar loja",
+      "products/repositories/products.repository.ts/getStore"
+    );
+  }
+
+  public async getById(product_id: string): Promise<Product> {
+    return this.execute(
+      async () => {
+        const [result] = await db
           .select()
           .from(products)
           .where(eq(products.id, product_id));
-        return result[0];
-      },
-      "Error ao buscar o Produto",
-      "auth/repositories/products.repository.ts/getById"
-    );
-  }
-
-  public async getAll(): Promise<ProductInsert[]> {
-    return this.execute(
-      async () => {
-        const result = await db.select().from(products);
         return result;
       },
-      "Error ao buscar o Produto",
-      "auth/repositories/products.repository.ts/getAll"
+      "Erro ao buscar produto",
+      "products/repositories/products.repository.ts/getById"
     );
   }
 
-  public async update(
-    product_id: string,
-    data: ProductInsert
-  ): Promise<ProductInsert> {
+  public async getAll(): Promise<Product[]> {
     return this.execute(
       async () => {
-        const result = await db
+        return await db.select().from(products);
+      },
+      "Erro ao buscar produtos",
+      "products/repositories/products.repository.ts/getAll",
+      true // aceita array vazio
+    );
+  }
+
+  public async update(product_id: string, data: ProductUpdate): Promise<Product> {
+    return this.execute(
+      async () => {
+        const [result] = await db
           .update(products)
           .set(data)
           .where(eq(products.id, product_id))
           .returning();
-        return result[0];
+        return result;
       },
-      "Error ao atualizar o Produto",
-      "auth/repositories/products.repository.ts/update"
+      "Erro ao atualizar produto",
+      "products/repositories/products.repository.ts/update"
     );
   }
 
-  public async delete(product_id: string): Promise<ProductInsert> {
+  public async delete(product_id: string): Promise<Product> {
     return this.execute(
       async () => {
-        const result = await db
+        const [result] = await db
           .delete(products)
           .where(eq(products.id, product_id))
           .returning();
-        return result[0];
+        return result;
       },
-      "Error ao deletar o Produto",
-      "auth/repositories/products.repository.ts/delete"
+      "Erro ao deletar produto",
+      "products/repositories/products.repository.ts/delete"
     );
   }
 }

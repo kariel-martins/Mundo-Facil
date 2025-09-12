@@ -1,4 +1,5 @@
 import { sendEmail } from "../../share/services/EmailService";
+import { storeCreatedEmailTemplate } from "../../share/templetes/Email.store";
 import { assertQueueWithDLQ, assertTopicExchange, bindQueue } from "../rabbitmq";
 
 const EXCHANGE = "store.events";
@@ -6,8 +7,8 @@ const DLX = "store.events.dlx";
 
 type productType = {
   email: string;
-  name: string;
   storeName: string;
+  image: string;
 };
 
 const STORE_CREATED_QUEUE = "store.created.send";
@@ -28,22 +29,19 @@ export async function startCreateStoreRequest() {
         const event = JSON.parse(msg.content.toString()) as productType;
         if (
           !event.email ||
-          !event.name ||
+          !event.image ||
           !event.storeName
         ) {
           throw new Error("Dados do evento incompletos");
         }
-        // await sendEmail(
-        //   event.email,
-        //   "Create Product",
-        //   productCreatedEmailTemplate(
-        //     event.name,
-        //     event.productName,
-        //     event.image,
-        //     event.price,
-        //     event.storeName,
-        //   )
-        // );
+        await sendEmail(
+          event.email,
+          "Create store",
+          storeCreatedEmailTemplate(
+            event.storeName,
+            event.image,
+          )
+        );
         ch.ack(msg);
         console.log("✅ E-mail de recuperação enviado:", event.email);
       } catch (err) {

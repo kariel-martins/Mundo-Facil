@@ -87,7 +87,7 @@ async function publish(exchange, routingKey, message, options = {}) {
     const ch = await getPublisherChannel();
     await ch.assertExchange(exchange, "topic", { durable: true });
     const payload = Buffer.from(JSON.stringify(message));
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const ok = ch.publish(exchange, routingKey, payload, {
             persistent: true,
             contentType: "application/json",

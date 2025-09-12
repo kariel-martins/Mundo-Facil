@@ -36,8 +36,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JWTService = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const env_1 = require("../../config/env");
+const AppErro_1 = require("../../errors/AppErro");
 const { jwtSecret } = (0, env_1.env)();
 class JWTService {
+    async signToken(uid, minutes) {
+        try {
+            const authToken = await this.sign({ scope: uid }, minutes);
+            if (!authToken || authToken === "JWT_SECRET_NOT_FOUND") {
+                throw new AppErro_1.AppError("Erro ao gerar o token", 400);
+            }
+            return authToken;
+        }
+        catch (error) {
+            console.error("Erro em signToken:", error);
+            throw new AppErro_1.AppError("Não foi possível gerar o token", 500, "auth/services/service.auth.ts/signToken");
+        }
+    }
+    async verifyToken(token) {
+        try {
+            const authToken = await this.verify(token);
+            if (!authToken ||
+                (typeof authToken === "string" &&
+                    [
+                        "JWT_SECRET_NOT_FOUND",
+                        "INVALID_TOKEN",
+                        "ERRO_TOKEN_VERIFY",
+                    ].includes(authToken))) {
+                throw new AppErro_1.AppError("Token inválido", 400);
+            }
+            return authToken;
+        }
+        catch (error) {
+            console.error("Erro em verifyToken:", error);
+            throw new AppErro_1.AppError("Não foi possível verificar o token", 500, "auth/services/service.auth.ts/verifyToken");
+        }
+    }
     async sign(data, expireInMinutes = 15) {
         if (!jwtSecret)
             return "JWT_SECRET_NOT_FOUND";

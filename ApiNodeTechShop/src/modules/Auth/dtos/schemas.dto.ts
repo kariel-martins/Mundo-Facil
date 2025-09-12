@@ -9,9 +9,9 @@ export const validateSignUpRequestedSchema = validation((getSchema) => ({
         name: constValidation.name,
         email: constValidation.email,
         password: constValidation.password,
-        confPassword: constValidation.password,
+        confirmPassword: constValidation.password,
       })
-      .refine((data) => data.password === data.confPassword, {
+      .refine((data) => data.password === data.confirmPassword, {
         message: "As senhas não coincidem",
         path: ["confPassword"],
       })
@@ -50,14 +50,17 @@ export const validateResetPasswordRequestedSchema = validation((getSchema) => ({
   body: getSchema(
     z
       .object({
-        name: constValidation.name,
-        email: constValidation.email,
         password: constValidation.password,
-        confPassword: constValidation.password,
+        confirmPassword: constValidation.password,
       })
-      .refine((data) => data.password === data.confPassword, {
+      .refine((data) => data.password === data.confirmPassword, {
         message: "As senhas não coincidem",
         path: ["confPassword"],
       })
   ),
+  query: getSchema(
+      z.object({
+        token: z.string(),
+      })
+    ),
 }));

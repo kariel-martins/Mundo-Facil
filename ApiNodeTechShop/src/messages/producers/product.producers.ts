@@ -14,6 +14,6 @@ type productType = {
 
 export async function publishCreateProductRequest(data: productType) {
     const event = {...data}
-    await publish(EXCHANGE, "products.product.created", event, {headers: {"x-service": "product"}})
+    await publish(EXCHANGE, "product.created.requested", event, {headers: {"x-service": "product"}})
     console.log("📨 Evento publicado: auth.user.created", event);
 }

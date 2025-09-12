@@ -1,23 +1,17 @@
-import { InferInsertModel } from "drizzle-orm";
-import { products } from "../../../database/schema.database";
+import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { products, stores } from "../../../database/schema.database";
 
-export type ProductInsert = InferInsertModel<typeof products>
+// Produto completo (registro do banco)
+export type Product = InferSelectModel<typeof products>;
 
+// DTO para criação (não inclui id, createdAt, updatedAt)
+export type ProductInsert = InferInsertModel<typeof products>;
+
+// DTO para atualização parcial
+export type ProductUpdate = Partial<ProductInsert>;
+
+// Estrutura quando fazemos join de produto com loja
 export type productStore = {
-  products: {
-    id: string;
-    productName: string;
-    price: number;
-    store_id: string;
-    image: string;
-    estoque: number;
-    created_at: Date;
-  };
-  stores: {
-    id: string;
-    boss_id: string;
-    storeName: string;
-    email: string;
-    created_at: Date;
-  };
+  products: Product;
+  stores: InferSelectModel<typeof stores>;
 };

@@ -8,6 +8,13 @@
       "when": 1757015556188,
       "tag": "0000_early_dark_beast",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1757630144333,
+      "tag": "0001_conscious_crystal",
+      "breakpoints": true
     }
   ]
 }

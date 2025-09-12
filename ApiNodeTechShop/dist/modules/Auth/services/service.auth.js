@@ -1,167 +1,155 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthService = exports.AuthTokenService = void 0;
+exports.AuthService = void 0;
 const AppErro_1 = require("../../../errors/AppErro");
 const auth_producers_1 = require("../../../messages/producers/auth.producers");
 const CryptoService_1 = require("../../../share/services/CryptoService");
 const JWTService_1 = require("../../../share/services/JWTService");
 const auth_repository_1 = require("../repositories/auth.repository");
-class AuthTokenService {
-    jwtService = new JWTService_1.JWTService();
-    async signToken(uid, minutes) {
-        try {
-            const authToken = await this.jwtService.sign({ scope: uid }, minutes);
-            if (!authToken || authToken === "JWT_SECRET_NOT_FOUND")
-                throw new AppErro_1.AppError("Erro ao gera o token", 400);
-            return authToken;
-        }
-        catch {
-            throw new AppErro_1.AppError("Não foi possível gerar o token", 500, "auth/services/service.auth.ts/signToken");
-        }
-    }
-    async verifyToken(token) {
-        try {
-            const authToken = await this.jwtService.verify(token);
-            if (!authToken ||
-                authToken === "JWT_SECRET_NOT_FOUND" ||
-                authToken === "INVALID_TOKEN" ||
-                authToken === "ERRO_TOKEN_VERIFY")
-                throw new AppErro_1.AppError("Erro ao verificar o token", 400);
-            return authToken;
-        }
-        catch {
-            throw new AppErro_1.AppError("Não foi possível verificar o token", 500, "auth/services/service.auth.ts/verifyToken");
-        }
-    }
-}
-exports.AuthTokenService = AuthTokenService;
+const crypto_1 = __importDefault(require("crypto"));
 class AuthService {
     repo = new auth_repository_1.AuthRepository();
-    tokenService = new AuthTokenService();
-    Crypto = new CryptoService_1.CryptoService();
-    async registerUser(data) {
+    tokenService = new JWTService_1.JWTService();
+    crypto = new CryptoService_1.CryptoService();
+    // helper para padronizar tratamento de erros
+    async execute(fn, message, context) {
         try {
-            await this.getByEmail(data.email);
-            throw new AppErro_1.AppError("Email já existe", 409);
+            return await fn();
         }
-        catch {
-            try {
-                // criar o usuário
-                const passwordHash = await this.Crypto.hashText(data.password);
-                const auth = await this.repo.create({ ...data, passwordHash });
-                if (!auth)
-                    throw new AppErro_1.AppError("Error ao criar o usuário", 400);
-                // cria o token de verificão
-                const uid = auth.id;
-                if (!uid)
-                    throw new AppErro_1.AppError("Id Não encotrado!");
-                const token = await this.tokenService.signToken(uid, 15);
-                const tokenHash = await this.Crypto.hashText(token);
-                const userToken = await this.createTokenUser(tokenHash, 15, uid);
-                // Publicar eventos
-                await (0, auth_producers_1.publishUserCreated)({
-                    id: uid,
-                    name: auth.name,
-                    email: auth.email,
-                });
-                await (0, auth_producers_1.publishEmailVerificationRequested)({
-                    userId: uid,
-                    email: auth.email,
-                    token: token,
-                    expiresAt: userToken.expires_at.toISOString(),
-                });
-                return auth;
-            }
-            catch (err) {
-                throw new AppErro_1.AppError("Não foi possíel criar o usuário", 500, "auth/services/service.auth.ts/createUser");
-            }
+        catch (error) {
+            console.error(`Erro em ${context}:`, error);
+            if (error instanceof AppErro_1.AppError)
+                throw error;
+            throw new AppErro_1.AppError(message, 500, context);
         }
+    }
+    async registerUser(data) {
+        return this.execute(async () => {
+            // impede duplicidade
+            const existing = await this.repo.findByEmail(data.email, "ativo");
+            if (existing)
+                throw new AppErro_1.AppError("Email já existe", 409);
+            // cria usuário
+            const passwordHash = await this.crypto.hashText(data.password);
+            const auth = await this.repo.create({ ...data, passwordHash });
+            if (!auth)
+                throw new AppErro_1.AppError("Erro ao criar o usuário", 400);
+            // cria token de verificação
+            const uid = auth.id;
+            if (!uid)
+                throw new AppErro_1.AppError("Id não encontrado");
+            const token = await this.tokenService.signToken(uid, 15);
+            const tokenHash = await this.crypto.hashText(token);
+            const userToken = await this.createTokenUser(tokenHash, 15, uid);
+            // publica eventos
+            await (0, auth_producers_1.publishUserCreated)({
+                id: uid,
+                name: auth.name,
+                email: auth.email,
+            });
+            await (0, auth_producers_1.publishEmailVerificationRequested)({
+                userId: uid,
+                email: auth.email,
+                token: token,
+                expiresAt: userToken.expires_at.toISOString(),
+            });
+            // retorna user seguro
+            const { passwordHash: _, ...safeUser } = auth;
+            return safeUser;
+        }, "Não foi possível criar o usuário", "auth/services/service.auth.ts/registerUser");
+    }
+    async getUser(email, password) {
+        return this.execute(async () => {
+            const user = await this.getByEmail(email, "ativo");
+            if (!user)
+                throw new AppErro_1.AppError("Usuário não encontrado", 404);
+            const validPassword = await this.crypto.verifyText(password, user.passwordHash);
+            if (!validPassword)
+                throw new AppErro_1.AppError("Usuário ou senha inválidos", 401);
+            const { passwordHash: _, ...safeUser } = user;
+            return safeUser;
+        }, "Erro ao buscar usuário", "auth/services/service.auth.ts/getUser");
+    }
+    async forgotPassword(email) {
+        return this.execute(async () => {
+            const user = await this.getByEmail(email, "ativo");
+            if (!user || !user.id)
+                throw new AppErro_1.AppError("Usuário ou Id não encontrado", 404);
+            const resetId = crypto_1.default.randomUUID();
+            const token = await this.tokenService.signToken(resetId, 15);
+            const tokenHash = await this.crypto.hashText(token);
+            await this.createTokenUser(tokenHash, 15, user.id);
+            await (0, auth_producers_1.publishForgotPasswordEmail)(user.email, token, user.name);
+            return { message: "E-mail de recuperação enviado com sucesso" };
+        }, "Erro ao processar recuperação de senha", "auth/services/service.auth.ts/forgotPassword");
+    }
+    async verifyAuthentication(user_id, token) {
+        return this.execute(async () => {
+            const verification = await this.getByIdTokenVerification(user_id, token);
+            if (!verification)
+                throw new AppErro_1.AppError("Verificação não encontrada ou já usada", 404);
+            if (new Date() > verification.expires_at)
+                throw new AppErro_1.AppError("Token expirado", 400);
+            const uid = verification.user_id;
+            if (!uid)
+                throw new AppErro_1.AppError("Usuário não encontrado", 404);
+            return await this.updateAuthentication(uid);
+        }, "Erro ao verificar autenticação", "auth/services/service.auth.ts/verifyAuthentication");
+    }
+    async resetPassword(token, password) {
+        return this.execute(async () => {
+            const payload = await this.tokenService.verifyToken(token);
+            if (!payload ||
+                payload === "INVALID_TOKEN" ||
+                payload === "JWT_SECRET_NOT_FOUND" ||
+                payload === "ERRO_TOKEN_VERIFY")
+                throw new AppErro_1.AppError("Token inválido", 404, "services/resetPassword");
+            const user = await this.getByEmail(payload.scope, "ativo");
+            if (!user)
+                throw new AppErro_1.AppError("Email não encontrado", 404, "services/resetPassword");
+            const passwordHash = await this.crypto.hashText(password);
+            const updated = await this.updatePasswordUser(user.email, passwordHash);
+            await (0, auth_producers_1.publishResertPasswordUser)(updated.email, updated.name);
+            return { message: "Senha atualizada com sucesso" };
+        }, "Erro ao processar resetPassword", "auth/services/service.auth.ts/resetPassword");
     }
     async createTokenUser(token, minutes, user_Id) {
         const now = new Date();
-        const time = new Date(now.getTime() + minutes * 60 * 1000);
-        if (!time)
-            throw new AppErro_1.AppError("Erro ao gera a data", 500, "auth/services/service.auth.ts/createTokenUser");
-        try {
-            const auth = await this.repo.emailVerificationCreate(token, time, user_Id);
-            if (!auth)
-                throw new AppErro_1.AppError("Error ao criar o token de verificação", 400);
-            return auth;
-        }
-        catch {
-            throw new AppErro_1.AppError("Não foi possíel criar o token de verificação", 500, "auth/services/service.auth.ts/createTokenUser");
-        }
+        const expiresAt = new Date(now.getTime() + minutes * 60 * 1000);
+        if (!expiresAt)
+            throw new AppErro_1.AppError("Erro ao gerar a data de expiração", 500);
+        return this.execute(() => this.repo.emailVerificationCreate(token, expiresAt, user_Id), "Não foi possível criar o token de verificação", "auth/services/service.auth.ts/createTokenUser");
     }
-    async getByEmail(email) {
-        try {
-            const auth = await this.repo.findByEmail(email);
-            if (!auth)
+    async getByEmail(email, status) {
+        return this.execute(() => this.repo.findByEmail(email, status), "Usuário não encontrado", "auth/services/service.auth.ts/getByEmail");
+    }
+    async getByIdTokenVerification(user_id, token) {
+        return this.execute(async () => {
+            const tokenHash = await this.repo.findByIdTokenVerification(user_id);
+            if (!tokenHash)
                 throw new AppErro_1.AppError("Usuário não encontrado", 404);
-            return auth;
-        }
-        catch {
-            throw new AppErro_1.AppError("Usuário não encontrado", 500, "auth/services/service.auth.ts/getByEmail");
-        }
+            const isValid = await this.crypto.verifyText(token, tokenHash.tokenHash);
+            if (!isValid)
+                throw new AppErro_1.AppError("Token inválido", 404);
+            return tokenHash;
+        }, "Erro ao verificar token", "auth/services/service.auth.ts/getByIdTokenVerification");
     }
-    async getByIdTokenVerication(user_id, token) {
-        const tokenHash = await this.repo.findByIdTokenVerication(user_id);
-        if (!tokenHash)
-            throw new AppErro_1.AppError("Usuário não encotrado", 404);
-        const tokenVericate = await this.Crypto.verifyText(token, tokenHash.tokenHash);
-        console.log(tokenHash.tokenHash, "foi", token);
-        if (!tokenVericate)
-            throw new AppErro_1.AppError("Token inválido", 404);
-        const auth = await this.repo.findByIdTokenVerication(user_id);
-        if (!auth)
-            throw new AppErro_1.AppError("Token não encontrado", 404);
-        return auth;
-    }
-    async UpdatePasswordUser(email, password) {
-        try {
-            const auth = await this.repo.updatePassword(email, password);
-            if (!auth)
-                throw new AppErro_1.AppError("Error ao atualizar o usuário", 400);
-            return auth;
-        }
-        catch {
-            throw new AppErro_1.AppError("Error ao atualizar a senha do usuário", 500, "auth/services/service.auth.ts/UpdatePasswordUser");
-        }
-    }
-    async UpdateUser(email, email_verified_at, status) {
-        try {
-            const auth = await this.repo.updateAutenticationUser(email, email_verified_at, status);
-            if (!auth)
-                throw new AppErro_1.AppError("Error ao atualizar o usuário", 400);
-            return auth;
-        }
-        catch {
-            throw new AppErro_1.AppError("Error ao atualizar o usuário", 500, "auth/services/service.auth.ts/UpdatePasswordUser");
-        }
-    }
-    async updateAutetication(user_id) {
-        try {
-            const verifyTokenUpdate = await this.repo.updateAuteticationToken(user_id);
-            if (!verifyTokenUpdate)
-                throw new AppErro_1.AppError("Error ao atualizar o token de verificação", 400);
-            const updatedUser = await this.repo.updateAutenticationUser(user_id, new Date(), "ativo");
+    async updateAuthentication(user_id) {
+        return this.execute(async () => {
+            const tokenUpdated = await this.repo.updateAuthenticationToken(user_id);
+            if (!tokenUpdated)
+                throw new AppErro_1.AppError("Erro ao atualizar o token de verificação", 400);
+            const updatedUser = await this.repo.updateAuthenticationUser(user_id, new Date(), "ativo");
             if (!updatedUser)
-                throw new AppErro_1.AppError("Error ao atualizar a autorização de usuário");
+                throw new AppErro_1.AppError("Erro ao atualizar autenticação de usuário", 400);
             return updatedUser;
-        }
-        catch {
-            throw new AppErro_1.AppError("Error ao atualizar o token de verificação", 500, "auth/services/service.auth.ts/updateAutetication");
-        }
+        }, "Erro ao atualizar autenticação", "auth/services/service.auth.ts/updateAuthentication");
     }
-    async removeTokenUser(userId) {
-        try {
-            const auth = await this.repo.removeTokenUser(userId);
-            if (!auth)
-                throw new AppErro_1.AppError("Error ao remove o token de verificação", 400);
-            return auth;
-        }
-        catch {
-            throw new AppErro_1.AppError("Error ao remove o token de verificação", 500, "auth/services/service.auth.ts/updateAutetication");
-        }
+    async updatePasswordUser(email, passwordHash) {
+        return this.execute(() => this.repo.updatePassword(email, passwordHash), "Erro ao atualizar a senha", "auth/services/service.auth.ts/updatePasswordUser");
     }
 }
 exports.AuthService = AuthService;

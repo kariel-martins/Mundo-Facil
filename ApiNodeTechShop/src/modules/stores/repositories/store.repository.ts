@@ -1,20 +1,23 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
-import { AppError } from "../../../errors/AppErro";
-import { StoreInsert } from "../dtos/types.store.dto";
 import { stores } from "../../../database/schema.database";
+import { AppError } from "../../../errors/AppErro";
+import { Store, StoreInsert, StoreUpdate } from "../dtos/store.types.store.dto";
 
 export class StoreRepository {
-  //helper para centralizer erros
+  // helper para centralizar erros
   private async execute<T>(
-    fn: () => Promise<T | undefined>,
+    fn: () => Promise<T>,
     message: string,
-    context: string
+    context: string,
+    allowEmpty = false
   ): Promise<T> {
     try {
       const result = await fn();
-      if (!result) {
-        throw new AppError(message, 404, context);
+      if (!result || (Array.isArray(result) && result.length === 0)) {
+        if (!allowEmpty) {
+          throw new AppError(message, 404, context);
+        }
       }
       return result;
     } catch (error: any) {
@@ -24,84 +27,72 @@ export class StoreRepository {
     }
   }
 
-  public async create(data: StoreInsert): Promise<StoreInsert> {
+  public async create(data: StoreInsert): Promise<Store> {
     return this.execute(
       async () => {
-        const result = await db.insert(stores).values(data).returning();
-        return result[0];
+        const [newStore] = await db.insert(stores).values(data).returning();
+        return newStore;
       },
-      "Erro ao criar Produto",
-      "auth/repositories/products.repository.ts/create"
+      "Erro ao criar loja",
+      "stores/repositories/store.repository.ts/create"
     );
   }
 
-  public async getById(store_id: string): Promise<StoreInsert> {
+  public async getById(store_id: string): Promise<Store> {
     return this.execute(
       async () => {
-        const result = await db
-          .select()
-          .from(stores)
-          .where(eq(stores.id, store_id));
-        return result[0];
-      },
-      "Error ao buscar o Produto",
-      "auth/repositories/products.repository.ts/getById"
-    );
-  }
-  public async getStore(name: string, email: string): Promise<StoreInsert> {
-    return this.execute(
-      async () => {
-        const result = await db
-          .select()
-          .from(stores)
-          .where(and(eq(stores.email, email), eq(stores.storeName, name)));
-        return result[0];
-      },
-      "Error ao buscar o Produto",
-      "auth/repositories/products.repository.ts/getById"
-    );
-  }
-
-  public async getAll(): Promise<StoreInsert[]> {
-    return this.execute(
-      async () => {
-        const result = await db.select().from(stores);
+        const [result] = await db.select().from(stores).where(eq(stores.id, store_id));
         return result;
       },
-      "Error ao buscar o Produto",
-      "auth/repositories/products.repository.ts/getAll"
+      "Erro ao buscar loja",
+      "stores/repositories/store.repository.ts/getById"
+    );
+  }
+  public async getStore(email: string , storeName: string): Promise<Store> {
+    return this.execute(
+      async () => {
+        const result = await db.select().from(stores).where(and(eq(stores.email, email), eq(stores.storeName, storeName)));
+        return result[0];
+      },
+      "Erro ao buscar loja",
+      "stores/repositories/store.repository.ts/getStore"
     );
   }
 
-  public async update(
-    store_id: string,
-    data: StoreInsert
-  ): Promise<StoreInsert> {
+  public async getAll(): Promise<Store[]> {
     return this.execute(
       async () => {
-        const result = await db
+        return await db.select().from(stores);
+      },
+      "Erro ao buscar lojas",
+      "stores/repositories/store.repository.ts/getAll",
+      true // permite retornar []
+    );
+  }
+
+  public async update(store_id: string, data: StoreUpdate): Promise<Store> {
+    return this.execute(
+      async () => {
+        const [result] = await db
           .update(stores)
           .set(data)
           .where(eq(stores.id, store_id))
           .returning();
-        return result[0];
+        return result;
       },
-      "Error ao atualizar o Produto",
-      "auth/repositories/products.repository.ts/update"
+      "Erro ao atualizar loja",
+      "stores/repositories/store.repository.ts/update"
     );
   }
 
-  public async delete(store_id: string): Promise<StoreInsert> {
+  public async delete(store_id: string): Promise<Store> {
     return this.execute(
       async () => {
-        const result = await db
-          .delete(stores)
-          .where(eq(stores.id, store_id))
-          .returning();
-        return result[0];
+        const [result] = await db.delete(stores).where(eq(stores.id, store_id)).returning();
+        return result;
       },
-      "Error ao deletar o Produto",
-      "auth/repositories/products.repository.ts/delete"
+      "Erro ao deletar loja",
+      "stores/repositories/store.repository.ts/delete"
     );
   }
 }
