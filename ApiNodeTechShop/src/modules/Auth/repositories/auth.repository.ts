@@ -67,6 +67,12 @@ export class AuthRepository {
     );
   }
 
+  async findByEmailOrNull(email: string): Promise<null | AppError> {
+      const [result] = await db.select().from(users).where(eq(users.email, email))
+      if (result) throw new AppError("Usuário já existe", 409)
+      return null
+  }
+
   async findByIdTokenVerification(user_id: string): Promise<emailVerification> {
     return this.execute(
       async () => {

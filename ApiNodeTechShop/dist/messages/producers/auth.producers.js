@@ -42,16 +42,14 @@ async function publishForgotPasswordEmail(email, token, name) {
         name,
     };
     await (0, rabbitmq_1.publish)(EXCHANGE, "auth.forgot.password.requested", event, { headers: { "x-service": "auth" } });
-    console.log("📨 Evento publicado: auth.forgot.password.requested", event, {
-        headers: { "x-service": "auth" },
-    });
+    console.log("📨 Evento publicado: auth.forgot.password.requested", event);
 }
 async function publishResertPasswordUser(email, name) {
     const event = {
         email,
         name,
     };
-    await (0, rabbitmq_1.publish)(EXCHANGE, "auth.resert.password.requested", event, {
+    await (0, rabbitmq_1.publish)(EXCHANGE, "auth.reset.password.requested", event, {
         headers: { "x-service": "auth" },
     });
     console.log("📨  Evento publicado: auth.resert.password.requested", event);

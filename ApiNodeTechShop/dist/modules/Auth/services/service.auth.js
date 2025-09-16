@@ -1,7 +1,4 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const AppErro_1 = require("../../../errors/AppErro");
@@ -9,7 +6,6 @@ const auth_producers_1 = require("../../../messages/producers/auth.producers");
 const CryptoService_1 = require("../../../share/services/CryptoService");
 const JWTService_1 = require("../../../share/services/JWTService");
 const auth_repository_1 = require("../repositories/auth.repository");
-const crypto_1 = __importDefault(require("crypto"));
 class AuthService {
     repo = new auth_repository_1.AuthRepository();
     tokenService = new JWTService_1.JWTService();
@@ -29,9 +25,12 @@ class AuthService {
     async registerUser(data) {
         return this.execute(async () => {
             // impede duplicidade
-            const existing = await this.repo.findByEmail(data.email, "ativo");
-            if (existing)
-                throw new AppErro_1.AppError("Email já existe", 409);
+            try {
+                const existing = await this.repo.findByEmail(data.email, "ativo");
+                if (existing)
+                    throw new AppErro_1.AppError("Email já existe", 409);
+            }
+            catch { }
             // cria usuário
             const passwordHash = await this.crypto.hashText(data.password);
             const auth = await this.repo.create({ ...data, passwordHash });
@@ -78,8 +77,7 @@ class AuthService {
             const user = await this.getByEmail(email, "ativo");
             if (!user || !user.id)
                 throw new AppErro_1.AppError("Usuário ou Id não encontrado", 404);
-            const resetId = crypto_1.default.randomUUID();
-            const token = await this.tokenService.signToken(resetId, 15);
+            const token = await this.tokenService.signToken(user.email, 15);
             const tokenHash = await this.crypto.hashText(token);
             await this.createTokenUser(tokenHash, 15, user.id);
             await (0, auth_producers_1.publishForgotPasswordEmail)(user.email, token, user.name);

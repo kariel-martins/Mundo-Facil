@@ -9,7 +9,6 @@ import { CryptoService } from "../../../share/services/CryptoService";
 import { JWTService } from "../../../share/services/JWTService";
 import { authInsert, emailVerification } from "../dtos/types.dto.auth";
 import { AuthRepository } from "../repositories/auth.repository";
-import crypto from "crypto";
 
 interface RegisterData {
   name: string;
@@ -18,6 +17,11 @@ interface RegisterData {
 }
 
 type SafeUser = Omit<authInsert, "passwordHash">;
+
+interface registerUserProps {
+  safeUser: SafeUser,
+  token: string
+}
 
 export class AuthService {
   private repo = new AuthRepository();
@@ -39,14 +43,12 @@ export class AuthService {
     }
   }
 
-  public async registerUser(data: RegisterData): Promise<SafeUser> {
+  public async registerUser(data: RegisterData): Promise<registerUserProps> {
     return this.execute(
       async () => {
         // impede duplicidade
-        try {
-          const existing = await this.repo.findByEmail(data.email, "ativo");
-          if (existing) throw new AppError("Email já existe", 409);
-        } catch {}
+          const existing = await this.repo.findByEmailOrNull(data.email);
+          if (existing instanceof AppError) throw new AppError("Usuário já existe", 409);
 
         // cria usuário
         const passwordHash = await this.crypto.hashText(data.password);
@@ -75,7 +77,7 @@ export class AuthService {
 
         // retorna user seguro
         const { passwordHash: _, ...safeUser } = auth;
-        return safeUser;
+        return { safeUser, token};
       },
       "Não foi possível criar o usuário",
       "auth/services/service.auth.ts/registerUser"
@@ -115,7 +117,7 @@ export class AuthService {
         await this.createTokenUser(tokenHash, 15, user.id);
 
         await publishForgotPasswordEmail(user.email, token, user.name);
-        return { message: "E-mail de recuperação enviado com sucesso" };
+        return { message: "E-mail de recuperação enviado com sucesso", token: token };
       },
       "Erro ao processar recuperação de senha",
       "auth/services/service.auth.ts/forgotPassword"

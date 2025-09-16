@@ -6,6 +6,7 @@ volumes:
   prometheus_data: {}
   grafana_data: {}
   postgres_data: {}
+  redis_data: {}
 
 services:
   prometheus:
@@ -63,6 +64,23 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - monitoring
+  
+  redis:
+    image: redis:7.2
+    container_name: redis_ecommerce
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
     networks:
       - monitoring
 
@@ -78,6 +96,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+      - redis
     environment:
       # Postgres
       URL_DATABASE: postgres://kariel:karielpass@postgres:5432/techshop
@@ -87,6 +106,10 @@ services:
 
       # RabbitMQ
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
     networks:
       - monitoring

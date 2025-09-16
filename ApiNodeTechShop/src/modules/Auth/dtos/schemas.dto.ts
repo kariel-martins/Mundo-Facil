@@ -39,7 +39,7 @@ export const validateEmailVerificationRequestedSchema = validation(
   (getSchema) => ({
     query: getSchema(
       z.object({
-        userId: z.string(),
+        user_id: z.string(),
         token: z.string(),
       })
     ),

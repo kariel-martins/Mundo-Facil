@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
 import { AppError } from "../../../errors/AppErro";
-import { orders } from "../../../database/schema.database";
-import { Order, OrderInsert, OrderUpdate } from "../dtos/order.type.dto";
+import { orders, products, stores } from "../../../database/schema.database";
+import { Order, OrderInsert, OrderStoreProducts, OrderUpdate } from "../dtos/order.type.dto";
 
 export class OrderRepository {
   private async execute<T>(
@@ -29,11 +29,12 @@ export class OrderRepository {
     }
   }
 
-  public async createOrder(data: OrderInsert): Promise<Order> {
+  public async createOrder(data: OrderInsert): Promise<OrderStoreProducts> {
     return this.execute(
       async () => {
-        const [order] = await db.insert(orders).values(data).returning();
-        return order;
+        const [newOrder] = await db.insert(orders).values(data).returning();
+        const [result] = await db.select().from(orders).innerJoin(stores, eq(orders.store_id, stores.id)).innerJoin(products, eq(orders.product_id, products.id)).where(eq(orders.id, newOrder.id))
+        return result;
       },
       "Erro ao criar pedido",
       "orders/repositories/order.repository.ts/createOrder"

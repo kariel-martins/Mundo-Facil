@@ -45,12 +45,12 @@ export async function startCreateStoreRequest() {
         ch.ack(msg);
         console.log("✅ E-mail de recuperação enviado:", event.email);
       } catch (err) {
-        console.error("❌ Falha ao processar create product:", err);
+        console.error("❌ Falha ao processar create store:", err);
         ch.ack(msg, false);
       }
     });
   } catch (error) {
-    console.error("❌ Falha ao iniciar consumer de create product:", error);
+    console.error("❌ Falha ao iniciar consumer de create store:", error);
     throw error;
   }
 }

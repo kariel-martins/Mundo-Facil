@@ -10,9 +10,9 @@ exports.validateSignUpRequestedSchema = (0, validations_1.validation)((getSchema
         name: constsValidetions_1.constValidation.name,
         email: constsValidetions_1.constValidation.email,
         password: constsValidetions_1.constValidation.password,
-        confPassword: constsValidetions_1.constValidation.password,
+        confirmPassword: constsValidetions_1.constValidation.password,
     })
-        .refine((data) => data.password === data.confPassword, {
+        .refine((data) => data.password === data.confirmPassword, {
         message: "As senhas não coincidem",
         path: ["confPassword"],
     })),
@@ -37,13 +37,14 @@ exports.validateEmailVerificationRequestedSchema = (0, validations_1.validation)
 exports.validateResetPasswordRequestedSchema = (0, validations_1.validation)((getSchema) => ({
     body: getSchema(zod_1.z
         .object({
-        name: constsValidetions_1.constValidation.name,
-        email: constsValidetions_1.constValidation.email,
         password: constsValidetions_1.constValidation.password,
-        confPassword: constsValidetions_1.constValidation.password,
+        confirmPassword: constsValidetions_1.constValidation.password,
     })
-        .refine((data) => data.password === data.confPassword, {
+        .refine((data) => data.password === data.confirmPassword, {
         message: "As senhas não coincidem",
         path: ["confPassword"],
+    })),
+    query: getSchema(zod_1.z.object({
+        token: zod_1.z.string(),
     })),
 }));

@@ -31,13 +31,8 @@ const EMAIL_VERIFICATION_PATTERN = "auth.email.verification.requested";
 
 export async function startEmailVerificationConsumer() {
   try {
-    // ✅ 1. Primeiro garantir que o exchange principal existe
     await assertTopicExchange(EXCHANGE);
-
-    // ✅ 2. Configurar queue com DLQ
     const ch = await assertQueueWithDLQ(EMAIL_VERIFICATION_QUEUE, DLX);
-
-    // ✅ 3. Agora fazer binding (a função bindQueue já declara o exchange)
     await bindQueue(
       EMAIL_VERIFICATION_QUEUE,
       EXCHANGE,
@@ -70,7 +65,7 @@ export async function startEmailVerificationConsumer() {
       }
     });
   } catch (error) {
-    console.error("❌ Falha ao iniciar consumer:", error);
+    console.error("❌ Falha ao iniciar consumer de EmailVerification:", error);
     throw error;
   }
 }
@@ -108,7 +103,7 @@ export async function startForgotPasswordConsumer() {
         ch.ack(msg);
         console.log("✅ E-mail de recuperação enviado:", event.email);
       } catch (err) {
-        console.error("❌ Falha ao processar forgotPassword:", err);
+        console.error("❌ Falha ao processar forgotPassword:", err,);
         ch.ack(msg, false);
       }
     });
@@ -153,7 +148,7 @@ export async function startResertPasswordConsumer() {
       }
     });
   } catch (error) {
-    console.error("❌ Falha ao iniciar consumer de forgotPassword:", error);
+    console.error("❌ Falha ao iniciar consumer de resetPassword:", error);
     throw error;
   }
 }

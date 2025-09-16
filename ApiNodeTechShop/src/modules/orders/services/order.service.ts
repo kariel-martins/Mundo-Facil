@@ -1,5 +1,6 @@
 import { AppError } from "../../../errors/AppErro";
-import { Order, OrderInsert, OrderUpdate } from "../dtos/order.type.dto";
+import { publishCreateOrderResquest } from "../../../messages/producers/orders.producers";
+import { Order, OrderInsert, OrderStoreProducts, OrderUpdate } from "../dtos/order.type.dto";
 import { OrderRepository } from "../repositories/order.repository";
 
 export class OrderService {
@@ -19,11 +20,12 @@ export class OrderService {
     }
   }
 
-  public async createOrder(data: OrderInsert): Promise<Order> {
+  public async createOrder(data: OrderInsert): Promise<OrderStoreProducts> {
     return this.execute(
       async () => {
         const order = await this.repo.createOrder(data);
         if (!order) throw new AppError("Erro ao criar pedido", 400);
+        await publishCreateOrderResquest({email: order.stores.email, productImage: order.products.image, ProductName: order.products.productName, storeName: order.stores.storeName})
         return order;
       },
       "Erro ao criar pedido",

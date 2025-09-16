@@ -14,11 +14,8 @@ const EMAIL_VERIFICATION_QUEUE = "email.verification.send";
 const EMAIL_VERIFICATION_PATTERN = "auth.email.verification.requested";
 async function startEmailVerificationConsumer() {
     try {
-        // ✅ 1. Primeiro garantir que o exchange principal existe
         await (0, rabbitmq_1.assertTopicExchange)(EXCHANGE);
-        // ✅ 2. Configurar queue com DLQ
         const ch = await (0, rabbitmq_1.assertQueueWithDLQ)(EMAIL_VERIFICATION_QUEUE, DLX);
-        // ✅ 3. Agora fazer binding (a função bindQueue já declara o exchange)
         await (0, rabbitmq_1.bindQueue)(EMAIL_VERIFICATION_QUEUE, EXCHANGE, EMAIL_VERIFICATION_PATTERN);
         await ch.prefetch(10);
         console.log(`👂 Aguardando mensagens em: ${EMAIL_VERIFICATION_QUEUE} (pattern: ${EMAIL_VERIFICATION_PATTERN})`);
@@ -30,7 +27,7 @@ async function startEmailVerificationConsumer() {
                 if (!event.email || !event.token || !event.userId) {
                     throw new Error("Dados do evento incompletos");
                 }
-                await (0, EmailService_1.sendEmail)(event.email, "Create Account", (0, Email_auth_1.createContaEmailTemplate)("auth/verify-email", event.token, event.userId));
+                await (0, EmailService_1.sendEmail)(event.email, "Create Account", (0, Email_auth_1.createContaEmailTemplate)("/auth/verify-email", event.token, event.userId));
                 ch.ack(msg);
                 console.log("✅ E-mail de verificação enviado:", event.email);
             }
@@ -41,7 +38,7 @@ async function startEmailVerificationConsumer() {
         });
     }
     catch (error) {
-        console.error("❌ Falha ao iniciar consumer:", error);
+        console.error("❌ Falha ao iniciar consumer de EmailVerification:", error);
         throw error;
     }
 }
@@ -54,7 +51,7 @@ async function startForgotPasswordConsumer() {
         const ch = await (0, rabbitmq_1.assertQueueWithDLQ)(FORGOT_PASSWORD_QUEUE, DLX);
         await (0, rabbitmq_1.bindQueue)(FORGOT_PASSWORD_QUEUE, EXCHANGE, FORGOT_PASSWORD_PATTERN);
         await ch.prefetch(10);
-        console.log(`👂 Aguardando mensagens em: ${FORGOT_PASSWORD_QUEUE}`);
+        console.log(`👂 Aguardando mensagens em: ${FORGOT_PASSWORD_QUEUE} (pattern: ${EMAIL_VERIFICATION_PATTERN}`);
         ch.consume(FORGOT_PASSWORD_QUEUE, async (msg) => {
             if (!msg)
                 return;
@@ -62,7 +59,7 @@ async function startForgotPasswordConsumer() {
                 const event = JSON.parse(msg.content.toString());
                 if (!event.email || !event.token)
                     throw new Error("Dados de evento incompletos");
-                await (0, EmailService_1.sendEmail)(event.email, "Forgot Password", (0, Email_auth_1.resetPasswordEmailTemplate)(event.name, "auth/resert-password", event.token));
+                await (0, EmailService_1.sendEmail)(event.email, "Forgot Password", (0, Email_auth_1.resetPasswordEmailTemplate)(event.name, "/auth/resert-password", event.token));
                 ch.ack(msg);
                 console.log("✅ E-mail de recuperação enviado:", event.email);
             }
@@ -78,15 +75,15 @@ async function startForgotPasswordConsumer() {
     }
 }
 //================ Resert Password =======================
-const RESERT_PASSWORD_QUEUE = "email.forgot.password.send";
-const RESERT_PASSWORD_PATTERN = "auth.resert.password.requested";
+const RESERT_PASSWORD_QUEUE = "email.reset.password.send";
+const RESERT_PASSWORD_PATTERN = "auth.reset.password.requested";
 async function startResertPasswordConsumer() {
     try {
         await (0, rabbitmq_1.assertTopicExchange)(EXCHANGE);
         const ch = await (0, rabbitmq_1.assertQueueWithDLQ)(RESERT_PASSWORD_QUEUE, DLX);
         await (0, rabbitmq_1.bindQueue)(RESERT_PASSWORD_QUEUE, EXCHANGE, RESERT_PASSWORD_PATTERN);
         await ch.prefetch(10);
-        console.log(`👂 Aguardando mensagens em: ${RESERT_PASSWORD_QUEUE}`);
+        console.log(`👂 Aguardando mensagens em: ${RESERT_PASSWORD_QUEUE} (pattern: ${EMAIL_VERIFICATION_PATTERN}`);
         ch.consume(RESERT_PASSWORD_QUEUE, async (msg) => {
             if (!msg)
                 return;
@@ -105,7 +102,7 @@ async function startResertPasswordConsumer() {
         });
     }
     catch (error) {
-        console.error("❌ Falha ao iniciar consumer de forgotPassword:", error);
+        console.error("❌ Falha ao iniciar consumer de resetPassword:", error);
         throw error;
     }
 }

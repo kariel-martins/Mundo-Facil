@@ -6,7 +6,6 @@ import { Product, ProductInsert, ProductUpdate, productStore } from "../dtos/typ
 import { Store } from "../../stores/dtos/store.types.store.dto";
 
 export class ProductRepository {
-  // helper para centralizar erros
   private async execute<T>(
     fn: () => Promise<T>,
     message: string,

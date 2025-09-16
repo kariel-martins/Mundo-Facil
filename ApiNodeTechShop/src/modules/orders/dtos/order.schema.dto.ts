@@ -1,10 +1,11 @@
 import { validation } from "../../../share/middleware/validations";
 import { z } from "zod";
 import { constValidation } from "../../../share/utils/constsValidetions";
-export const validateCartSchemaCreate = validation((getSchema) => ({
+export const validateOrderSchemaCreate = validation((getSchema) => ({
   body: getSchema(
     z.object({
-        quantity: constValidation.number
+        quantity: constValidation.number,
+        store_id: constValidation.id
     })
   ),
   params: getSchema(
@@ -19,23 +20,23 @@ export const validateCartSchemaCreate = validation((getSchema) => ({
   )
 }));
 
-export const validateCartSchemaById = validation((getSchema) => ({
+export const validateOrderSchemaById = validation((getSchema) => ({
   params: getSchema(
     z.object({
-      product_id: constValidation.id,
+      order_id: constValidation.id,
     })
   ),
 }));
 
-export const validateCartSchemaUpdate = validation((getSchema) => ({
+export const validateOrderSchemaUpdate = validation((getSchema) => ({
   body: getSchema(
     z.object({
-        quantity: constValidation.number
+        quantity: constValidation.number.optional()
     })
   ),
   params: getSchema(
     z.object({
-      cart_id: constValidation.id,
+      order_id: constValidation.id,
     })
   )
 }));

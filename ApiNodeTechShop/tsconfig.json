@@ -12,7 +12,8 @@
     "skipLibCheck": true,
     "moduleResolution": "node16",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "isolatedModules": true,
   },
   "include": ["src"],
   "exclude": ["drizzle.config.ts"]
