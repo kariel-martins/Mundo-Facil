@@ -1,5 +1,5 @@
 import { AppError } from "../../../errors/AppErro";
-import { CartInsert } from "../dtos/cart.type.dto";
+import { Cart, CartInsert, CartWithProduct, UpdateCart } from "../dtos/cart.type.dto";
 import { CartRepository } from "../repositories/cart.repository";
 
 export class CartService {
@@ -34,10 +34,10 @@ export class CartService {
     );
   }
 
-  public async getByIdCart(cart_id: string): Promise<CartInsert> {
+  public async getCart(user_id: string): Promise<CartWithProduct[]> {
     return this.execute(
       async () => {
-        const cart = await this.repo.findCart(cart_id);
+        const cart = await this.repo.findCart(user_id);
         if (!cart) throw new AppError("carrinho não encontrado", 404);
         return cart;
       },
@@ -46,22 +46,10 @@ export class CartService {
     );
   }
 
-  public async getAllCart(): Promise<CartInsert[]> {
-    return this.execute(
-      async () => {
-        const carts = await this.repo.findAllCart();
-        if (!carts) throw new AppError("Não há carrinhos", 404);
-        return carts;
-      },
-      "Erro ao buscar carrinhos",
-      "carts/services/cart.service.ts/getAllCart"
-    );
-  }
-
   public async updateCart(
     cart_id: string,
     data: CartInsert
-  ): Promise<CartInsert> {
+  ): Promise<UpdateCart> {
     return this.execute(
       async () => {
         const cart = await this.repo.updateCart(cart_id, data);
@@ -73,7 +61,7 @@ export class CartService {
       "carts/services/cart.service.ts/updateCart"
     );
   }
-  public async deleteCart(cart_id: string): Promise<CartInsert> {
+  public async deleteCart(cart_id: string): Promise<Cart> {
     return this.execute(
       async () => {
         const cart = await this.repo.deleteCart(cart_id);

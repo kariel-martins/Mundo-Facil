@@ -48,21 +48,17 @@ export class StoreRepository {
       "stores/repositories/store.repository.ts/getById"
     );
   }
-  public async getStore(email: string , storeName: string): Promise<Store> {
-    return this.execute(
-      async () => {
-        const result = await db.select().from(stores).where(and(eq(stores.email, email), eq(stores.storeName, storeName)));
-        return result[0];
-      },
-      "Erro ao buscar loja",
-      "stores/repositories/store.repository.ts/getStore"
-    );
-  }
 
-  public async getAll(): Promise<Store[]> {
+  async findByStoreOrNull(storeName: string): Promise<null | AppError> {
+        const [result] = await db.select().from(stores).where(eq(stores.storeName, storeName))
+        if (result) throw new AppError("Usuário já existe", 409)
+        return null
+    }
+  
+  public async getAll(boss_id: string): Promise<Store[]> {
     return this.execute(
       async () => {
-        return await db.select().from(stores);
+        return await db.select().from(stores).where(eq(stores.boss_id, boss_id));
       },
       "Erro ao buscar lojas",
       "stores/repositories/store.repository.ts/getAll",

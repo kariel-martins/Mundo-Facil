@@ -6,6 +6,7 @@ const password = z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8
 const number = z.number()
 const id = z.string()
 const url = z.url()
+const status = z.enum(['Processando', 'enviado', 'A caminho', 'Entregue'])
 
   export const constValidation = {
     name,
@@ -14,4 +15,5 @@ const url = z.url()
     id,
     number,
     url,
+    status
   }

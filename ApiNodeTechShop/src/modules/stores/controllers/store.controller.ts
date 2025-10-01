@@ -42,10 +42,11 @@ export const getStore: RequestHandler = async (req, res) => {
       });
   }
 };
-export const getAllStore: RequestHandler = async (_req, res) => {
+export const getAllStore: RequestHandler = async (req, res) => {
   try {
-    const store = await service.getAll();
-    return res.status(201).json({ store });
+    const { boss_id } = req.params
+    const store = await service.getAll(boss_id);
+    return res.status(201).json( store );
   } catch (error: any) {
     if (error instanceof AppError) {
       return res

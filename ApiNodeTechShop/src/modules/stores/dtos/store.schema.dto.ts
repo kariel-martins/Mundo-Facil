@@ -18,6 +18,11 @@ export const validateStoreSchemaById = validation((getSchema)=> ({
        store_id: constValidation.id
     }))
 }))
+export const validateStoreSchemaAll = validation((getSchema)=> ({
+    params: getSchema(z.object({
+       boss_id: constValidation.id
+    }))
+}))
 
 export const validateStoreSchemaUpdate = validation((getSchema)=> ({
     body: getSchema(z.object({

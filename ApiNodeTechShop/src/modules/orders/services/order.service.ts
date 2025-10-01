@@ -1,6 +1,6 @@
 import { AppError } from "../../../errors/AppErro";
 import { publishCreateOrderResquest } from "../../../messages/producers/orders.producers";
-import { Order, OrderInsert, OrderStoreProducts, OrderUpdate } from "../dtos/order.type.dto";
+import { Order, OrderInsert, OrderProducts, OrderStoreProducts, OrderUpdate } from "../dtos/order.type.dto";
 import { OrderRepository } from "../repositories/order.repository";
 
 export class OrderService {
@@ -33,22 +33,10 @@ export class OrderService {
     );
   }
 
-  public async getByIdOrder(order_id: string): Promise<Order> {
+  public async getAllOrders(user_id: string): Promise<OrderProducts[]> {
     return this.execute(
       async () => {
-        const order = await this.repo.findOrder(order_id);
-        if (!order) throw new AppError("Não foi possível buscar o produto", 400);
-        return order;
-      },
-      "Erro ao buscar pedido",
-      "orders/services/order.service.ts/getByIdOrder"
-    );
-  }
-
-  public async getAllOrders(): Promise<Order[]> {
-    return this.execute(
-      async () => {
-        return await this.repo.findAllOrders();
+        return await this.repo.findAllOrders(user_id);
       },
       "Erro ao buscar pedidos",
       "orders/services/order.service.ts/getAllOrders"

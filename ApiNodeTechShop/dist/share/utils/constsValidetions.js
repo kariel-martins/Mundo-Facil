@@ -8,6 +8,7 @@ const password = zod_1.z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W
 const number = zod_1.z.number();
 const id = zod_1.z.string();
 const url = zod_1.z.url();
+const status = zod_1.z.enum(['Processando', 'enviado', 'A caminho', 'Entregue']);
 exports.constValidation = {
     name,
     email,
@@ -15,4 +16,5 @@ exports.constValidation = {
     id,
     number,
     url,
+    status
 };

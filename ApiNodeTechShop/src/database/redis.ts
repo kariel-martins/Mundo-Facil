@@ -14,4 +14,4 @@ redis.on("error", (err) => {
   console.error("❌ Erro no Redis:", err);
 });
 
-export default redis;
+export { redis }

@@ -1,6 +1,6 @@
 import { AppError } from "../../../errors/AppErro";
 import { publishCreatedStoreRequest } from "../../../messages/producers/store.producers";
-import { StoreInsert } from "../dtos/store.types.store.dto";
+import { Store, StoreInsert } from "../dtos/store.types.store.dto";
 import { StoreRepository } from "../repositories/store.repository";
 
 export class StoreService {
@@ -23,17 +23,16 @@ export class StoreService {
   public async create(data: StoreInsert, image: string): Promise<StoreInsert> {
     return this.execute(
       async () => {
-        try {
-          const existing = await this.repo.getStore(data.email, data.storeName);
-          if (existing) throw new AppError("Já existe loja cadastrada", 409);
-        } catch {}
+          const existing = await this.repo.findByStoreOrNull(data.storeName);
+          if (existing instanceof AppError) 
+            throw new AppError("Já existe loja cadastrada", 409);
        
         const store = await this.repo.create(data);
         if (!store) throw new AppError("Não foi possível criar a loja", 404);
 
         await publishCreatedStoreRequest({storeName: store.storeName, image: image, email: store.email})
         return store;
-      },"Erro ao criar a loja", "stores/services/store.service.ts/registerStore"
+      },"Erro ao criar a loja", "stores/services/store.service.ts/create"
     );
   }
 
@@ -43,17 +42,17 @@ export class StoreService {
         const store = await this.repo.getById(store_id);
         if (!store) throw new AppError("Loja não encontrada", 409);
         return store;
-      },"Erro ao buscar pela loja", "stores/services/store.service.ts/getStoreById"
+      },"Erro ao buscar pela loja", "stores/services/store.service.ts/getById"
     );
   }
 
-  public async getAll(): Promise<StoreInsert[]> {
+  public async getAll(boss_id: string): Promise<Store[]> {
     return this.execute(
       async () => {
-        const store = await this.repo.getAll();
+        const store = await this.repo.getAll(boss_id);
         if (!store || store.length === 0) throw new AppError("Não lojas cadastradas", 409);
         return store;
-      },"Erro ao buscar pela loja", "stores/services/store.service.ts/getStoreById"
+      },"Erro ao buscar pela loja", "stores/services/store.service.ts/getAll"
     );
   }
 
@@ -67,7 +66,7 @@ export class StoreService {
         if (!store)
           throw new AppError("Não foi possível atualizar a loja", 404);
         return store;
-      },"Erro ao atualizar a loja","stores/services/store.service.ts/updateStore"
+      },"Erro ao atualizar a loja","stores/services/store.service.ts/update"
     );
   }
 
@@ -77,7 +76,7 @@ export class StoreService {
         const store = await this.repo.delete(store_id);
         if (!store) throw new AppError("Não foi possível deletar a loja", 404);
         return store;
-      },"Erro ao deletar a loja","stores/services/store.service.ts/deleteStore"
+      },"Erro ao deletar a loja","stores/services/store.service.ts/delete"
     );
   }
 }

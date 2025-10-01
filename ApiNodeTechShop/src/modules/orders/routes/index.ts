@@ -1,7 +1,6 @@
 import { Router } from "express";
 import {
   createOrder,
-  getByIdOrder,
   getAllOrders,
   updateOrder,
   deleteOrder,
@@ -10,9 +9,8 @@ import { validateOrderSchemaById, validateOrderSchemaCreate, validateOrderSchema
 
 const OrderRouter = Router();
 
-OrderRouter.post("/",validateOrderSchemaCreate, createOrder);
-OrderRouter.get("/", getAllOrders);
-OrderRouter.get("/:order_id", validateOrderSchemaById, getByIdOrder);
+OrderRouter.post("/", validateOrderSchemaCreate, createOrder);
+OrderRouter.get("/:user_id", validateOrderSchemaById, getAllOrders);
 OrderRouter.put("/:order_id", validateOrderSchemaUpdate, updateOrder);
 OrderRouter.delete("/:order_id", validateOrderSchemaById, deleteOrder);
 

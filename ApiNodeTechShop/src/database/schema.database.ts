@@ -34,8 +34,9 @@ export const email_verifications = pgTable("email_verifications", {
 export const stores = pgTable("stores", { 
   id: uuid().primaryKey().notNull().defaultRandom(),
   boss_id: uuid("boss_id").references(()=> users.id, {onDelete: "cascade"}).notNull(),
+  rating: integer(),
   storeName: text().unique().notNull(),
-  email: text().unique().notNull(),
+  email: text().notNull(),
   created_at: timestamp("created_at", { withTimezone: true })
     .notNull()
     .default(sql`NOW()`),
@@ -45,7 +46,12 @@ export const products = pgTable("products", {
   id: uuid().primaryKey().defaultRandom().notNull(),
   store_id: uuid("store_id").references(()=> stores.id, {onDelete: "cascade"}).notNull(),
   productName: text().notNull(),
+  category: text().notNull(),
+  discount: integer(),
+  rating: integer(),
   price: integer().default(0).notNull(),
+  description: text(),
+  priceOrigin: integer(),//!!!! talvez esse item não seja aqui
   estoque: integer().default(0).notNull(),
   image: text().notNull(),
   created_at: timestamp("created_at", { withTimezone: true })
@@ -72,6 +78,7 @@ export const orders = pgTable("orders", {
   product_id: uuid("product_id")
     .notNull()
     .references(() => products.id),
+  status: text().notNull().default("Processando"),
   quantity: integer().notNull().default(0),
   created_at: timestamp("created_at", { withTimezone: true })
     .notNull()

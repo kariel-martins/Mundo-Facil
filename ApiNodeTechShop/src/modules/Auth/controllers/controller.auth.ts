@@ -19,7 +19,7 @@ export const signUp: RequestHandler = async (req, res) => {
     }
 };
 
-export const verifyAuthenticationUser: RequestHandler = async (req, res) => {
+export const verifyAuthenticationEmailUser: RequestHandler = async (req, res) => {
   const { user_id, token } = req.query;
 
   if (typeof token !== "string" || typeof user_id !== "string") {
@@ -27,7 +27,7 @@ export const verifyAuthenticationUser: RequestHandler = async (req, res) => {
   }
 
   try {
-    const verifyUser = await service.verifyAuthentication(user_id, token);
+    await service.verifyAuthentication(user_id, token);
     return res.status(200).json({ message: "Email verificado com sucesso" });
   } catch (error: any) {
       if (error instanceof AppError) {
@@ -39,11 +39,21 @@ export const verifyAuthenticationUser: RequestHandler = async (req, res) => {
     }
 };
 
+export const verifyAuthentication: RequestHandler = async (_req, res) => {
+  return res.status(200).json({ok: true})
+}
+
 export const signIn: RequestHandler = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await service.getUser(email, password);
-    return res.status(200).json({ user });
+    res.cookie("auth_token", user.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+        sameSite: "strict", 
+        maxAge: 1000 * 60 * 15
+    })
+    return res.status(200).json(user.user);
   } catch (error: any) {
       if (error instanceof AppError) {
         return res

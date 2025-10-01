@@ -30,7 +30,7 @@ exports.validateEmailRequestedSchema = (0, validations_1.validation)((getSchema)
 }));
 exports.validateEmailVerificationRequestedSchema = (0, validations_1.validation)((getSchema) => ({
     query: getSchema(zod_1.z.object({
-        userId: zod_1.z.string(),
+        user_id: zod_1.z.string(),
         token: zod_1.z.string(),
     })),
 }));

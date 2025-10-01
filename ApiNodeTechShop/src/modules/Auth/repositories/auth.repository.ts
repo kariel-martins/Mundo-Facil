@@ -1,8 +1,8 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../../database/client.database";
-import { email_verifications, users } from "../../../database/schema.database";
+import { email_verifications, stores, users } from "../../../database/schema.database";
 import { AppError } from "../../../errors/AppErro";
-import { authInsert, emailVerification } from "../dtos/types.dto.auth";
+import { authInsert, emailVerification, User } from "../dtos/types.dto.auth";
 
 export class AuthRepository {
   // helper para centralizar erros
@@ -53,14 +53,14 @@ export class AuthRepository {
     );
   }
 
-  async findByEmail(email: string, status: string): Promise<authInsert> {
+  async findByEmail(email: string, status: string): Promise<User> {
     return this.execute(
       async () => {
-        const result = await db
+        const [result] = await db
           .select()
           .from(users)
           .where(and(eq(users.email, email), eq(users.status, status)));
-        return result[0];
+        return result;
       },
       "Usuário não encontrado",
       "auth/repositories/auth.repository.ts/findByEmail"

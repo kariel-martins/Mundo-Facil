@@ -27,7 +27,7 @@ async function startEmailVerificationConsumer() {
                 if (!event.email || !event.token || !event.userId) {
                     throw new Error("Dados do evento incompletos");
                 }
-                await (0, EmailService_1.sendEmail)(event.email, "Create Account", (0, Email_auth_1.createContaEmailTemplate)("/auth/verify-email", event.token, event.userId));
+                await (0, EmailService_1.sendEmail)(event.email, "Create Account", (0, Email_auth_1.createContaEmailTemplate)("/verify-email", event.token, event.userId));
                 ch.ack(msg);
                 console.log("✅ E-mail de verificação enviado:", event.email);
             }
@@ -59,7 +59,7 @@ async function startForgotPasswordConsumer() {
                 const event = JSON.parse(msg.content.toString());
                 if (!event.email || !event.token)
                     throw new Error("Dados de evento incompletos");
-                await (0, EmailService_1.sendEmail)(event.email, "Forgot Password", (0, Email_auth_1.resetPasswordEmailTemplate)(event.name, "/auth/resert-password", event.token));
+                await (0, EmailService_1.sendEmail)(event.email, "Forgot Password", (0, Email_auth_1.resetPasswordEmailTemplate)(event.name, "/reset-password", event.token));
                 ch.ack(msg);
                 console.log("✅ E-mail de recuperação enviado:", event.email);
             }

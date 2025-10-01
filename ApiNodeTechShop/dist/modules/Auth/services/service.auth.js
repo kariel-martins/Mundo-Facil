@@ -5,11 +5,13 @@ const AppErro_1 = require("../../../errors/AppErro");
 const auth_producers_1 = require("../../../messages/producers/auth.producers");
 const CryptoService_1 = require("../../../share/services/CryptoService");
 const JWTService_1 = require("../../../share/services/JWTService");
+const maskFunctions_1 = require("../../../share/utils/maskFunctions");
 const auth_repository_1 = require("../repositories/auth.repository");
 class AuthService {
     repo = new auth_repository_1.AuthRepository();
     tokenService = new JWTService_1.JWTService();
     crypto = new CryptoService_1.CryptoService();
+    MaskUser = new maskFunctions_1.MaskData();
     // helper para padronizar tratamento de erros
     async execute(fn, message, context) {
         try {
@@ -25,12 +27,9 @@ class AuthService {
     async registerUser(data) {
         return this.execute(async () => {
             // impede duplicidade
-            try {
-                const existing = await this.repo.findByEmail(data.email, "ativo");
-                if (existing)
-                    throw new AppErro_1.AppError("Email já existe", 409);
-            }
-            catch { }
+            const existing = await this.repo.findByEmailOrNull(data.email);
+            if (existing instanceof AppErro_1.AppError)
+                throw new AppErro_1.AppError("Usuário já existe", 409);
             // cria usuário
             const passwordHash = await this.crypto.hashText(data.password);
             const auth = await this.repo.create({ ...data, passwordHash });
@@ -57,31 +56,45 @@ class AuthService {
             });
             // retorna user seguro
             const { passwordHash: _, ...safeUser } = auth;
-            return safeUser;
+            return { safeUser, token };
         }, "Não foi possível criar o usuário", "auth/services/service.auth.ts/registerUser");
     }
     async getUser(email, password) {
         return this.execute(async () => {
-            const user = await this.getByEmail(email, "ativo");
-            if (!user)
+            const user = await this.repo.findByEmail(email, "ativo");
+            if (!user.id)
                 throw new AppErro_1.AppError("Usuário não encontrado", 404);
             const validPassword = await this.crypto.verifyText(password, user.passwordHash);
             if (!validPassword)
                 throw new AppErro_1.AppError("Usuário ou senha inválidos", 401);
-            const { passwordHash: _, ...safeUser } = user;
-            return safeUser;
+            const uid = user.id;
+            if (!uid)
+                throw new AppErro_1.AppError("Id não encontrado");
+            const token = await this.tokenService.signToken(uid, 15);
+            const maskDataUser = {
+                user: {
+                    user_id: uid,
+                    email: this.MaskUser.maskEmail(user.email),
+                    name: user.name,
+                },
+                token: token,
+            };
+            return maskDataUser;
         }, "Erro ao buscar usuário", "auth/services/service.auth.ts/getUser");
     }
     async forgotPassword(email) {
         return this.execute(async () => {
-            const user = await this.getByEmail(email, "ativo");
+            const user = await this.repo.findByEmail(email, "ativo");
             if (!user || !user.id)
                 throw new AppErro_1.AppError("Usuário ou Id não encontrado", 404);
             const token = await this.tokenService.signToken(user.email, 15);
             const tokenHash = await this.crypto.hashText(token);
             await this.createTokenUser(tokenHash, 15, user.id);
             await (0, auth_producers_1.publishForgotPasswordEmail)(user.email, token, user.name);
-            return { message: "E-mail de recuperação enviado com sucesso" };
+            return {
+                message: "E-mail de recuperação enviado com sucesso",
+                token: token,
+            };
         }, "Erro ao processar recuperação de senha", "auth/services/service.auth.ts/forgotPassword");
     }
     async verifyAuthentication(user_id, token) {
@@ -105,7 +118,7 @@ class AuthService {
                 payload === "JWT_SECRET_NOT_FOUND" ||
                 payload === "ERRO_TOKEN_VERIFY")
                 throw new AppErro_1.AppError("Token inválido", 404, "services/resetPassword");
-            const user = await this.getByEmail(payload.scope, "ativo");
+            const user = await this.repo.findByEmail(payload.scope, "ativo");
             if (!user)
                 throw new AppErro_1.AppError("Email não encontrado", 404, "services/resetPassword");
             const passwordHash = await this.crypto.hashText(password);
@@ -120,9 +133,6 @@ class AuthService {
         if (!expiresAt)
             throw new AppErro_1.AppError("Erro ao gerar a data de expiração", 500);
         return this.execute(() => this.repo.emailVerificationCreate(token, expiresAt, user_Id), "Não foi possível criar o token de verificação", "auth/services/service.auth.ts/createTokenUser");
-    }
-    async getByEmail(email, status) {
-        return this.execute(() => this.repo.findByEmail(email, status), "Usuário não encontrado", "auth/services/service.auth.ts/getByEmail");
     }
     async getByIdTokenVerification(user_id, token) {
         return this.execute(async () => {

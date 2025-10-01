@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPassword = exports.forgotPassword = exports.signIn = exports.verifyAuthenticationUser = exports.signUp = void 0;
+exports.resetPassword = exports.forgotPassword = exports.signIn = exports.verifyAuthentication = exports.verifyAuthenticationEmailUser = exports.signUp = void 0;
 const service_auth_1 = require("../services/service.auth");
 const AppErro_1 = require("../../../errors/AppErro");
 const service = new service_auth_1.AuthService();
@@ -20,14 +20,14 @@ const signUp = async (req, res) => {
     }
 };
 exports.signUp = signUp;
-const verifyAuthenticationUser = async (req, res) => {
+const verifyAuthenticationEmailUser = async (req, res) => {
     const { user_id, token } = req.query;
     if (typeof token !== "string" || typeof user_id !== "string") {
         return res.status(401).json({ errors: { default: "Token e user_id não são válidos" } });
     }
     try {
-        const verifyUser = await service.verifyAuthentication(user_id, token);
-        return res.status(200).json({ verifyUser });
+        await service.verifyAuthentication(user_id, token);
+        return res.status(200).json({ message: "Email verificado com sucesso" });
     }
     catch (error) {
         if (error instanceof AppErro_1.AppError) {
@@ -38,12 +38,22 @@ const verifyAuthenticationUser = async (req, res) => {
         return res.status(500).json({ message: "Erro ao processar verifyAuthenticationUser", context: "auth/controllers/auth.controller.ts/verifyAuthenticationUser" });
     }
 };
-exports.verifyAuthenticationUser = verifyAuthenticationUser;
+exports.verifyAuthenticationEmailUser = verifyAuthenticationEmailUser;
+const verifyAuthentication = async (_req, res) => {
+    return res.status(200).json({ ok: true });
+};
+exports.verifyAuthentication = verifyAuthentication;
 const signIn = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await service.getUser(email, password);
-        return res.status(200).json({ user });
+        res.cookie("auth_token", user.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 1000 * 60 * 15
+        });
+        return res.status(200).json(user.user);
     }
     catch (error) {
         if (error instanceof AppErro_1.AppError) {

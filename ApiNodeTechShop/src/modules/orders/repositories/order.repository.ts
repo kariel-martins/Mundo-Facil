@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
 import { AppError } from "../../../errors/AppErro";
 import { orders, products, stores } from "../../../database/schema.database";
-import { Order, OrderInsert, OrderStoreProducts, OrderUpdate } from "../dtos/order.type.dto";
+import { Order, OrderInsert, OrderProducts, OrderStoreProducts, OrderUpdate } from "../dtos/order.type.dto";
 
 export class OrderRepository {
   private async execute<T>(
@@ -41,24 +41,10 @@ export class OrderRepository {
     );
   }
 
-  public async findOrder(order_id: string): Promise<Order | null> {
+  public async findAllOrders(user_id: string): Promise<OrderProducts[]> {
     return this.execute(
       async () => {
-        const [order] = await db
-          .select()
-          .from(orders)
-          .where(eq(orders.id, order_id));
-        return order ?? null;
-      },
-      "Pedido não encontrado",
-      "orders/repositories/order.repository.ts/findOrder"
-    );
-  }
-
-  public async findAllOrders(): Promise<Order[]> {
-    return this.execute(
-      async () => {
-        const result = await db.select().from(orders);
+        const result = await db.select().from(orders).innerJoin(products, eq(products.id, orders.product_id)).where(eq(orders.user_id, user_id));
         return result;
       },
       "Nenhum pedido encontrado",

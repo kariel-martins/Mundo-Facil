@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
 import { AppError } from "../../../errors/AppErro";
-import { CartInsert } from "../dtos/cart.type.dto";
-import { carts } from "../../../database/schema.database";
+import { Cart, CartInsert, CartWithProduct, UpdateCart } from "../dtos/cart.type.dto";
+import { carts, products } from "../../../database/schema.database";
 
 export class CartRepository {
   private async execute<T>(
@@ -23,9 +23,7 @@ export class CartRepository {
     }
   }
 
-  
-
-  public async create(data: CartInsert): Promise<CartInsert> {
+  public async create(data: CartInsert): Promise<Cart> {
       return this.execute(
         async () => {
           const result = await db.insert(carts).values(data).returning()
@@ -36,28 +34,18 @@ export class CartRepository {
       );
     }
 
-  public async findCart(cart_id: string): Promise<CartInsert> {
+  public async findCart(user_id: string): Promise<CartWithProduct[]> {
     return this.execute(
         async ()=> {
-            const result = await db.select().from(carts).where(eq(carts.id, cart_id))
+            const result = await db.select().from(carts).innerJoin(products, eq(products.id, carts.product_id)).where(eq(carts.user_id, user_id))
             if (!result) throw new AppError("carrinho não encontrado",404)
-            return result[0]
+            return result
         }, "Erro ao buscar o carrinho",
         "carts/repositories/cart.repository.ts/findCart"
     )
   }
-  public async findAllCart(): Promise<CartInsert[]> {
-    return this.execute(
-        async ()=> {
-            const results = await db.select().from(carts)
-            if (!results) throw new AppError("Não há carrinhos",404)
-            return results
-        }, "Erro ao buscar o carrinho",
-        "carts/repositories/cart.repository.ts/findAllCart"
-    )
-  }
 
-  public async updateCart(cart_id: string, data: CartInsert): Promise<CartInsert> {
+  public async updateCart(cart_id: string, data: CartInsert): Promise<UpdateCart> {
     return this.execute(
         async ()=> {
             const result = await db.update(carts).set(data).where(eq(carts.id, cart_id)).returning()
@@ -68,7 +56,7 @@ export class CartRepository {
     )
   }
 
-  public async deleteCart(cart_id: string): Promise<CartInsert> {
+  public async deleteCart(cart_id: string): Promise<Cart> {
     return this.execute(
         async ()=> {
             const result = await db.delete(carts).where(eq(carts.id, cart_id)).returning()

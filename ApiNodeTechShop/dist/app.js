@@ -7,12 +7,21 @@ exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const route_1 = require("./route");
 const prom_client_1 = require("prom-client");
+const cors_1 = __importDefault(require("cors"));
+const env_1 = require("./config/env");
 const app = (0, express_1.default)();
 exports.app = app;
+const { urlFrontEnd } = (0, env_1.env)();
 const requestCounter = new prom_client_1.Counter({
     name: 'http_request_total',
     help: 'Total de requisições HTTP recebidas',
 });
+app.use((0, cors_1.default)({
+    origin: urlFrontEnd,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+}));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((req, res, next) => {

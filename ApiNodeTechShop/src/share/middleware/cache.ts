@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import redis from "../../database/redis";
+import { redis } from "../../database/redis";
 
 export const cacheProdutos = async (req: Request, res: Response, next: NextFunction) => {
   try {

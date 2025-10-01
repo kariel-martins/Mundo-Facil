@@ -1,5 +1,5 @@
 {
-  "id": "8551375d-068a-4725-b06a-c36d29a56b89",
+  "id": "0782dda8-442f-4167-b643-77daa89017aa",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -19,7 +19,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "product_id": {
           "name": "product_id",
@@ -92,7 +92,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "tokenHash": {
           "name": "tokenHash",
@@ -157,7 +157,13 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "store_id": {
+          "name": "store_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
         },
         "product_id": {
           "name": "product_id",
@@ -188,6 +194,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "orders_store_id_stores_id_fk": {
+          "name": "orders_store_id_stores_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "stores",
+          "columnsFrom": [
+            "store_id"
           ],
           "columnsTo": [
             "id"
@@ -226,11 +245,54 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "name": {
-          "name": "name",
+        "store_id": {
+          "name": "store_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "productName": {
+          "name": "productName",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discount": {
+          "name": "discount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price": {
+          "name": "price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "priceOrigin": {
+          "name": "priceOrigin",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "estoque": {
           "name": "estoque",
@@ -245,18 +307,112 @@
           "primaryKey": false,
           "notNull": true
         },
-        "price": {
-          "name": "price",
-          "type": "integer",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
-          "default": 0
+          "notNull": true,
+          "default": "NOW()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "products_store_id_stores_id_fk": {
+          "name": "products_store_id_stores_id_fk",
+          "tableFrom": "products",
+          "tableTo": "stores",
+          "columnsFrom": [
+            "store_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stores": {
+      "name": "stores",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "boss_id": {
+          "name": "boss_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "storeName": {
+          "name": "storeName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stores_boss_id_users_id_fk": {
+          "name": "stores_boss_id_users_id_fk",
+          "tableFrom": "stores",
+          "tableTo": "users",
+          "columnsFrom": [
+            "boss_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "stores_storeName_unique": {
+          "name": "stores_storeName_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "storeName"
+          ]
+        },
+        "stores_email_unique": {
+          "name": "stores_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

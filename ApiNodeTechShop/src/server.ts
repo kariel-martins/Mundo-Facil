@@ -17,6 +17,7 @@ async function bootstrap() {
   await startCreateStoreRequest();
   await startOrderCreateConsumer()
 
+  
   await app.listen(dataEnv.port, () => {
     console.log("servido rodando!!!");
   });

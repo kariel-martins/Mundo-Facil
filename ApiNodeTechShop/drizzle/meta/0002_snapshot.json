@@ -1,6 +1,6 @@
 {
-  "id": "9999b3d3-2dac-4741-86cb-bcf3e78bf899",
-  "prevId": "0782dda8-442f-4167-b643-77daa89017aa",
+  "id": "723d8425-cc18-4ff3-a3c7-16c585b8600b",
+  "prevId": "9999b3d3-2dac-4741-86cb-bcf3e78bf899",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -170,6 +170,13 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Processando'"
         },
         "quantity": {
           "name": "quantity",

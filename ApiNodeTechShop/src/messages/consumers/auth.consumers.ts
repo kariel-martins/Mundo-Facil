@@ -55,7 +55,7 @@ export async function startEmailVerificationConsumer() {
         await sendEmail(
           event.email,
           "Create Account",
-          createContaEmailTemplate("/auth/verify-email", event.token, event.userId)
+          createContaEmailTemplate("/verify-email", event.token, event.userId)
         );
         ch.ack(msg);
         console.log("✅ E-mail de verificação enviado:", event.email);
@@ -96,7 +96,7 @@ export async function startForgotPasswordConsumer() {
           "Forgot Password",
           resetPasswordEmailTemplate(
             event.name,
-            "/auth/resert-password",
+            "/reset-password",
             event.token
           )
         );

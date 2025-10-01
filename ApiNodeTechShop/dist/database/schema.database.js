@@ -27,8 +27,9 @@ exports.email_verifications = (0, pg_core_1.pgTable)("email_verifications", {
 exports.stores = (0, pg_core_1.pgTable)("stores", {
     id: (0, pg_core_1.uuid)().primaryKey().notNull().defaultRandom(),
     boss_id: (0, pg_core_1.uuid)("boss_id").references(() => exports.users.id, { onDelete: "cascade" }).notNull(),
+    rating: (0, pg_core_1.integer)(),
     storeName: (0, pg_core_1.text)().unique().notNull(),
-    email: (0, pg_core_1.text)().unique().notNull(),
+    email: (0, pg_core_1.text)().notNull(),
     created_at: (0, pg_core_1.timestamp)("created_at", { withTimezone: true })
         .notNull()
         .default((0, drizzle_orm_1.sql) `NOW()`),
@@ -37,7 +38,12 @@ exports.products = (0, pg_core_1.pgTable)("products", {
     id: (0, pg_core_1.uuid)().primaryKey().defaultRandom().notNull(),
     store_id: (0, pg_core_1.uuid)("store_id").references(() => exports.stores.id, { onDelete: "cascade" }).notNull(),
     productName: (0, pg_core_1.text)().notNull(),
+    category: (0, pg_core_1.text)().notNull(),
+    discount: (0, pg_core_1.integer)(),
+    rating: (0, pg_core_1.integer)(),
     price: (0, pg_core_1.integer)().default(0).notNull(),
+    description: (0, pg_core_1.text)(),
+    priceOrigin: (0, pg_core_1.integer)(), //!!!! talvez esse item não seja aqui
     estoque: (0, pg_core_1.integer)().default(0).notNull(),
     image: (0, pg_core_1.text)().notNull(),
     created_at: (0, pg_core_1.timestamp)("created_at", { withTimezone: true })
@@ -62,6 +68,7 @@ exports.orders = (0, pg_core_1.pgTable)("orders", {
     product_id: (0, pg_core_1.uuid)("product_id")
         .notNull()
         .references(() => exports.products.id),
+    status: (0, pg_core_1.text)().notNull().default("Processando"),
     quantity: (0, pg_core_1.integer)().notNull().default(0),
     created_at: (0, pg_core_1.timestamp)("created_at", { withTimezone: true })
         .notNull()

@@ -39,12 +39,18 @@ class AuthRepository {
     }
     async findByEmail(email, status) {
         return this.execute(async () => {
-            const result = await client_database_1.db
+            const [result] = await client_database_1.db
                 .select()
                 .from(schema_database_1.users)
                 .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_database_1.users.email, email), (0, drizzle_orm_1.eq)(schema_database_1.users.status, status)));
-            return result[0];
+            return result;
         }, "Usuário não encontrado", "auth/repositories/auth.repository.ts/findByEmail");
+    }
+    async findByEmailOrNull(email) {
+        const [result] = await client_database_1.db.select().from(schema_database_1.users).where((0, drizzle_orm_1.eq)(schema_database_1.users.email, email));
+        if (result)
+            throw new AppErro_1.AppError("Usuário já existe", 409);
+        return null;
     }
     async findByIdTokenVerification(user_id) {
         return this.execute(async () => {

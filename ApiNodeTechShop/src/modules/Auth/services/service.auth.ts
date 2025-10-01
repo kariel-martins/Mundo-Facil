@@ -7,6 +7,7 @@ import {
 } from "../../../messages/producers/auth.producers";
 import { CryptoService } from "../../../share/services/CryptoService";
 import { JWTService } from "../../../share/services/JWTService";
+import { MaskData } from "../../../share/utils/maskFunctions";
 import { authInsert, emailVerification } from "../dtos/types.dto.auth";
 import { AuthRepository } from "../repositories/auth.repository";
 
@@ -16,17 +17,26 @@ interface RegisterData {
   password: string;
 }
 
+interface ResponseUser {
+  user: {
+    user_id: string;
+    name: string;
+    email: string;
+  };
+  token: string;
+}
 type SafeUser = Omit<authInsert, "passwordHash">;
 
 interface registerUserProps {
-  safeUser: SafeUser,
-  token: string
+  safeUser: SafeUser;
+  token: string;
 }
 
 export class AuthService {
   private repo = new AuthRepository();
   private tokenService = new JWTService();
   private crypto = new CryptoService();
+  private MaskUser = new MaskData();
 
   // helper para padronizar tratamento de erros
   private async execute<T>(
@@ -47,8 +57,9 @@ export class AuthService {
     return this.execute(
       async () => {
         // impede duplicidade
-          const existing = await this.repo.findByEmailOrNull(data.email);
-          if (existing instanceof AppError) throw new AppError("Usuário já existe", 409);
+        const existing = await this.repo.findByEmailOrNull(data.email);
+        if (existing instanceof AppError)
+          throw new AppError("Usuário já existe", 409);
 
         // cria usuário
         const passwordHash = await this.crypto.hashText(data.password);
@@ -77,18 +88,18 @@ export class AuthService {
 
         // retorna user seguro
         const { passwordHash: _, ...safeUser } = auth;
-        return { safeUser, token};
+        return { safeUser, token };
       },
       "Não foi possível criar o usuário",
       "auth/services/service.auth.ts/registerUser"
     );
   }
-
-  public async getUser(email: string, password: string): Promise<SafeUser> {
+  
+  public async getUser(email: string, password: string): Promise<ResponseUser> {
     return this.execute(
       async () => {
-        const user = await this.getByEmail(email, "ativo");
-        if (!user) throw new AppError("Usuário não encontrado", 404);
+        const user = await this.repo.findByEmail(email, "ativo");
+        if (!user.id) throw new AppError("Usuário não encontrado", 404);
 
         const validPassword = await this.crypto.verifyText(
           password,
@@ -97,8 +108,19 @@ export class AuthService {
         if (!validPassword)
           throw new AppError("Usuário ou senha inválidos", 401);
 
-        const { passwordHash: _, ...safeUser } = user;
-        return safeUser;
+        const uid = user.id;
+        if (!uid) throw new AppError("Id não encontrado");
+        const token = await this.tokenService.signToken(uid, 15);
+
+        const maskDataUser = {
+          user: {
+            user_id: uid,
+            email: this.MaskUser.maskEmail(user.email),
+            name: user.name,
+          },
+          token: token,
+        };
+        return maskDataUser;
       },
       "Erro ao buscar usuário",
       "auth/services/service.auth.ts/getUser"
@@ -108,7 +130,7 @@ export class AuthService {
   public async forgotPassword(email: string): Promise<{ message: string }> {
     return this.execute(
       async () => {
-        const user = await this.getByEmail(email, "ativo");
+        const user = await this.repo.findByEmail(email, "ativo");
         if (!user || !user.id)
           throw new AppError("Usuário ou Id não encontrado", 404);
 
@@ -117,7 +139,10 @@ export class AuthService {
         await this.createTokenUser(tokenHash, 15, user.id);
 
         await publishForgotPasswordEmail(user.email, token, user.name);
-        return { message: "E-mail de recuperação enviado com sucesso", token: token };
+        return {
+          message: "E-mail de recuperação enviado com sucesso",
+          token: token,
+        };
       },
       "Erro ao processar recuperação de senha",
       "auth/services/service.auth.ts/forgotPassword"
@@ -161,7 +186,7 @@ export class AuthService {
         )
           throw new AppError("Token inválido", 404, "services/resetPassword");
 
-        const user = await this.getByEmail(payload.scope, "ativo");
+        const user = await this.repo.findByEmail(payload.scope, "ativo");
         if (!user)
           throw new AppError(
             "Email não encontrado",
@@ -170,7 +195,10 @@ export class AuthService {
           );
 
         const passwordHash = await this.crypto.hashText(password);
-        const updated = await this.updatePasswordUser(user.email, passwordHash);
+        const updated = await this.updatePasswordUser(
+          user.email,
+          passwordHash
+        );
 
         await publishResertPasswordUser(updated.email, updated.name);
 
@@ -197,15 +225,6 @@ export class AuthService {
       "auth/services/service.auth.ts/createTokenUser"
     );
   }
-
-  private async getByEmail(email: string, status: string): Promise<authInsert> {
-    return this.execute(
-      () => this.repo.findByEmail(email, status),
-      "Usuário não encontrado",
-      "auth/services/service.auth.ts/getByEmail"
-    );
-  }
-
   private async getByIdTokenVerification(
     user_id: string,
     token: string
