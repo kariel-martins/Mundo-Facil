@@ -1,0 +1,9 @@
+.env.development
+.env.prodution
+.env
+
+/node_modules
+/docker-compose.yml
+/package-lock.json
+/dist
+.vscode

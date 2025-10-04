@@ -1,0 +1,65 @@
+import { RequestHandler } from "express";
+import { OrderService } from "../services/order.service";
+import { AppError } from "../../../errors/AppErro";
+
+const service = new OrderService();
+
+export const createOrder: RequestHandler = async (req, res) => {
+  try {
+    const data = req.body
+    const order = await service.createOrder(data);
+    return res.status(201).json(order);
+  } catch (error: any) {
+        if (error instanceof AppError) {
+          return res
+          .status(error.statusCode)
+          .json({ errors: { default: error.message } });
+        }
+        return res.status(500).json({message: "Erro ao processar createOrder", context: "orders/controllers/order.controller.ts/createOrder"})
+      }
+};
+
+export const getAllOrders: RequestHandler = async (req, res) => {
+  try {
+    const { user_id } = req.params
+    const orders = await service.getAllOrders(user_id);
+    return res.status(200).json(orders);
+  } catch (error: any) {
+        if (error instanceof AppError) {
+          return res
+          .status(error.statusCode)
+          .json({ errors: { default: error.message } });
+        }
+        return res.status(500).json({message: "Erro ao processar getAllOrders", context: "orders/controllers/order.controller.ts/getAllOrders"})
+      }
+};
+
+export const updateOrder: RequestHandler = async (req, res) => {
+  try {
+    const { order_id } = req.params;
+    const order = await service.updateOrder(order_id, req.body);
+    return res.status(200).json(order);
+  } catch (error: any) {
+        if (error instanceof AppError) {
+          return res
+          .status(error.statusCode)
+          .json({ errors: { default: error.message } });
+        }
+        return res.status(500).json({message: "Erro ao processar updateOrder", context: "orders/controllers/order.controller.ts/updateOrder"})
+      }
+};
+
+export const deleteOrder: RequestHandler = async (req, res) => {
+  try {
+    const { order_id } = req.params;
+    const order = await service.deleteOrder(order_id);
+    return res.status(200).json(order);
+  } catch (error: any) {
+        if (error instanceof AppError) {
+          return res
+          .status(error.statusCode)
+          .json({ errors: { default: error.message } });
+        }
+        return res.status(500).json({message: "Erro ao processar deleteOrder", context: "orders/controllers/order.controller.ts/deleteOrder"})
+      }
+};

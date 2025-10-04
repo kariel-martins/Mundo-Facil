@@ -1,0 +1,452 @@
+[
+  {
+    "productName":"Produto 1",
+    "category":"Automotivos",
+    "price":1169.97,
+    "description":"Descrição breve do Produto 1, ideal para automotivos.",
+    "estoque":162,
+    "image":"https:\/\/picsum.photos\/seed\/1\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 2",
+    "category":"Automotivos",
+    "price":874.55,
+    "description":"Descrição breve do Produto 2, ideal para automotivos.",
+    "estoque":48,
+    "image":"https:\/\/picsum.photos\/seed\/2\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 3",
+    "category":"Tecnologia Essencial",
+    "price":976.78,
+    "description":"Descrição breve do Produto 3, ideal para tecnologia essencial.",
+    "estoque":54,
+    "image":"https:\/\/picsum.photos\/seed\/3\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 4",
+    "category":"Casa & Conforto",
+    "price":462.75,
+    "description":"Descrição breve do Produto 4, ideal para casa & conforto.",
+    "estoque":133,
+    "image":"https:\/\/picsum.photos\/seed\/4\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 5",
+    "category":"Saúde & Bem-Estar",
+    "price":906.98,
+    "description":"Descrição breve do Produto 5, ideal para saúde & bem-estar.",
+    "estoque":10,
+    "image":"https:\/\/picsum.photos\/seed\/5\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 6",
+    "category":"Moda Básica",
+    "price":1083.92,
+    "description":"Descrição breve do Produto 6, ideal para moda básica.",
+    "estoque":166,
+    "image":"https:\/\/picsum.photos\/seed\/6\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 7",
+    "category":"Saúde & Bem-Estar",
+    "price":1424.84,
+    "description":"Descrição breve do Produto 7, ideal para saúde & bem-estar.",
+    "estoque":5,
+    "image":"https:\/\/picsum.photos\/seed\/7\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 8",
+    "category":"Moda Básica",
+    "price":146.61,
+    "description":"Descrição breve do Produto 8, ideal para moda básica.",
+    "estoque":7,
+    "image":"https:\/\/picsum.photos\/seed\/8\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 9",
+    "category":"Outros",
+    "price":992.21,
+    "description":"Descrição breve do Produto 9, ideal para outros.",
+    "estoque":173,
+    "image":"https:\/\/picsum.photos\/seed\/9\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 10",
+    "category":"Acessórios",
+    "price":439.27,
+    "description":"Descrição breve do Produto 10, ideal para acessórios.",
+    "estoque":200,
+    "image":"https:\/\/picsum.photos\/seed\/10\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 11",
+    "category":"Automotivos",
+    "price":1325.52,
+    "description":"Descrição breve do Produto 11, ideal para automotivos.",
+    "estoque":170,
+    "image":"https:\/\/picsum.photos\/seed\/11\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 12",
+    "category":"Acessórios",
+    "price":795.25,
+    "description":"Descrição breve do Produto 12, ideal para acessórios.",
+    "estoque":173,
+    "image":"https:\/\/picsum.photos\/seed\/12\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 13",
+    "category":"Ferramentas & Reparos",
+    "price":1320.98,
+    "description":"Descrição breve do Produto 13, ideal para ferramentas & reparos.",
+    "estoque":34,
+    "image":"https:\/\/picsum.photos\/seed\/13\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 14",
+    "category":"Outros",
+    "price":996.93,
+    "description":"Descrição breve do Produto 14, ideal para outros.",
+    "estoque":107,
+    "image":"https:\/\/picsum.photos\/seed\/14\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 15",
+    "category":"Tecnologia Essencial",
+    "price":495.11,
+    "description":"Descrição breve do Produto 15, ideal para tecnologia essencial.",
+    "estoque":10,
+    "image":"https:\/\/picsum.photos\/seed\/15\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 16",
+    "category":"Automotivos",
+    "price":523.04,
+    "description":"Descrição breve do Produto 16, ideal para automotivos.",
+    "estoque":64,
+    "image":"https:\/\/picsum.photos\/seed\/16\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 17",
+    "category":"Organização & Limpeza",
+    "price":538.59,
+    "description":"Descrição breve do Produto 17, ideal para organização & limpeza.",
+    "estoque":151,
+    "image":"https:\/\/picsum.photos\/seed\/17\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 18",
+    "category":"Tecnologia Essencial",
+    "price":463.19,
+    "description":"Descrição breve do Produto 18, ideal para tecnologia essencial.",
+    "estoque":183,
+    "image":"https:\/\/picsum.photos\/seed\/18\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 19",
+    "category":"Lazer Simples",
+    "price":521.15,
+    "description":"Descrição breve do Produto 19, ideal para lazer simples.",
+    "estoque":160,
+    "image":"https:\/\/picsum.photos\/seed\/19\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 20",
+    "category":"Ferramentas & Reparos",
+    "price":1184.5,
+    "description":"Descrição breve do Produto 20, ideal para ferramentas & reparos.",
+    "estoque":42,
+    "image":"https:\/\/picsum.photos\/seed\/20\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 21",
+    "category":"Acessórios",
+    "price":177.28,
+    "description":"Descrição breve do Produto 21, ideal para acessórios.",
+    "estoque":155,
+    "image":"https:\/\/picsum.photos\/seed\/21\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 22",
+    "category":"Automotivos",
+    "price":716.37,
+    "description":"Descrição breve do Produto 22, ideal para automotivos.",
+    "estoque":32,
+    "image":"https:\/\/picsum.photos\/seed\/22\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 23",
+    "category":"Saúde & Bem-Estar",
+    "price":1141.07,
+    "description":"Descrição breve do Produto 23, ideal para saúde & bem-estar.",
+    "estoque":174,
+    "image":"https:\/\/picsum.photos\/seed\/23\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 24",
+    "category":"Lazer Simples",
+    "price":655.69,
+    "description":"Descrição breve do Produto 24, ideal para lazer simples.",
+    "estoque":41,
+    "image":"https:\/\/picsum.photos\/seed\/24\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 25",
+    "category":"Tecnologia Essencial",
+    "price":561.74,
+    "description":"Descrição breve do Produto 25, ideal para tecnologia essencial.",
+    "estoque":177,
+    "image":"https:\/\/picsum.photos\/seed\/25\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 26",
+    "category":"Tecnologia Essencial",
+    "price":523.99,
+    "description":"Descrição breve do Produto 26, ideal para tecnologia essencial.",
+    "estoque":20,
+    "image":"https:\/\/picsum.photos\/seed\/26\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 27",
+    "category":"Outros",
+    "price":859.23,
+    "description":"Descrição breve do Produto 27, ideal para outros.",
+    "estoque":71,
+    "image":"https:\/\/picsum.photos\/seed\/27\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 28",
+    "category":"Casa & Conforto",
+    "price":856.75,
+    "description":"Descrição breve do Produto 28, ideal para casa & conforto.",
+    "estoque":129,
+    "image":"https:\/\/picsum.photos\/seed\/28\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 29",
+    "category":"Acessórios",
+    "price":60.06,
+    "description":"Descrição breve do Produto 29, ideal para acessórios.",
+    "estoque":17,
+    "image":"https:\/\/picsum.photos\/seed\/29\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 30",
+    "category":"Moda Básica",
+    "price":972.72,
+    "description":"Descrição breve do Produto 30, ideal para moda básica.",
+    "estoque":20,
+    "image":"https:\/\/picsum.photos\/seed\/30\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 31",
+    "category":"Organização & Limpeza",
+    "price":1313.48,
+    "description":"Descrição breve do Produto 31, ideal para organização & limpeza.",
+    "estoque":22,
+    "image":"https:\/\/picsum.photos\/seed\/31\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 32",
+    "category":"Tecnologia Essencial",
+    "price":1268.83,
+    "description":"Descrição breve do Produto 32, ideal para tecnologia essencial.",
+    "estoque":158,
+    "image":"https:\/\/picsum.photos\/seed\/32\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 33",
+    "category":"Lazer Simples",
+    "price":282.57,
+    "description":"Descrição breve do Produto 33, ideal para lazer simples.",
+    "estoque":95,
+    "image":"https:\/\/picsum.photos\/seed\/33\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 34",
+    "category":"Outros",
+    "price":227.19,
+    "description":"Descrição breve do Produto 34, ideal para outros.",
+    "estoque":62,
+    "image":"https:\/\/picsum.photos\/seed\/34\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 35",
+    "category":"Organização & Limpeza",
+    "price":780.32,
+    "description":"Descrição breve do Produto 35, ideal para organização & limpeza.",
+    "estoque":146,
+    "image":"https:\/\/picsum.photos\/seed\/35\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 36",
+    "category":"Lazer Simples",
+    "price":1412.68,
+    "description":"Descrição breve do Produto 36, ideal para lazer simples.",
+    "estoque":116,
+    "image":"https:\/\/picsum.photos\/seed\/36\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 37",
+    "category":"Lazer Simples",
+    "price":1147.1,
+    "description":"Descrição breve do Produto 37, ideal para lazer simples.",
+    "estoque":84,
+    "image":"https:\/\/picsum.photos\/seed\/37\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 38",
+    "category":"Casa & Conforto",
+    "price":527.01,
+    "description":"Descrição breve do Produto 38, ideal para casa & conforto.",
+    "estoque":138,
+    "image":"https:\/\/picsum.photos\/seed\/38\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 39",
+    "category":"Outros",
+    "price":315.4,
+    "description":"Descrição breve do Produto 39, ideal para outros.",
+    "estoque":16,
+    "image":"https:\/\/picsum.photos\/seed\/39\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 40",
+    "category":"Ferramentas & Reparos",
+    "price":511.42,
+    "description":"Descrição breve do Produto 40, ideal para ferramentas & reparos.",
+    "estoque":129,
+    "image":"https:\/\/picsum.photos\/seed\/40\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 41",
+    "category":"Organização & Limpeza",
+    "price":521.62,
+    "description":"Descrição breve do Produto 41, ideal para organização & limpeza.",
+    "estoque":106,
+    "image":"https:\/\/picsum.photos\/seed\/41\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 42",
+    "category":"Acessórios",
+    "price":414.47,
+    "description":"Descrição breve do Produto 42, ideal para acessórios.",
+    "estoque":63,
+    "image":"https:\/\/picsum.photos\/seed\/42\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 43",
+    "category":"Moda Básica",
+    "price":1180.37,
+    "description":"Descrição breve do Produto 43, ideal para moda básica.",
+    "estoque":37,
+    "image":"https:\/\/picsum.photos\/seed\/43\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 44",
+    "category":"Outros",
+    "price":840.92,
+    "description":"Descrição breve do Produto 44, ideal para outros.",
+    "estoque":107,
+    "image":"https:\/\/picsum.photos\/seed\/44\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 45",
+    "category":"Ferramentas & Reparos",
+    "price":1133.84,
+    "description":"Descrição breve do Produto 45, ideal para ferramentas & reparos.",
+    "estoque":99,
+    "image":"https:\/\/picsum.photos\/seed\/45\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 46",
+    "category":"Tecnologia Essencial",
+    "price":1164.46,
+    "description":"Descrição breve do Produto 46, ideal para tecnologia essencial.",
+    "estoque":95,
+    "image":"https:\/\/picsum.photos\/seed\/46\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 47",
+    "category":"Saúde & Bem-Estar",
+    "price":651.19,
+    "description":"Descrição breve do Produto 47, ideal para saúde & bem-estar.",
+    "estoque":200,
+    "image":"https:\/\/picsum.photos\/seed\/47\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 48",
+    "category":"Lazer Simples",
+    "price":749.18,
+    "description":"Descrição breve do Produto 48, ideal para lazer simples.",
+    "estoque":178,
+    "image":"https:\/\/picsum.photos\/seed\/48\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 49",
+    "category":"Lazer Simples",
+    "price":900.66,
+    "description":"Descrição breve do Produto 49, ideal para lazer simples.",
+    "estoque":160,
+    "image":"https:\/\/picsum.photos\/seed\/49\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  },
+  {
+    "productName":"Produto 50",
+    "category":"Ferramentas & Reparos",
+    "price":729.75,
+    "description":"Descrição breve do Produto 50, ideal para ferramentas & reparos.",
+    "estoque":17,
+    "image":"https:\/\/picsum.photos\/seed\/50\/300\/300",
+    "store_id":"fa6661ee-73ab-4434-9545-0300393ec91b"
+  }
+]
