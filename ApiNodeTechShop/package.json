@@ -13,10 +13,7 @@
     "db:migrate": "npx drizzle-kit migrate",
     "db:generate": "npx drizzle-kit generate",
     "db:studio": "npx drizzle-kit studio",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:verbose": "jest --verbose"
+    "seed:products": "ts-node src/database/seed/importProducts.ts"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.0",

@@ -22,6 +22,20 @@
       "when": 1759170027279,
       "tag": "0002_skinny_komodo",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759528891399,
+      "tag": "0003_familiar_black_tom",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1759528934844,
+      "tag": "0004_furry_professor_monster",
+      "breakpoints": true
     }
   ]
 }

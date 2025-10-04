@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import { numeric } from "drizzle-orm/pg-core";
 import {
   text,
   timestamp,
@@ -47,11 +48,9 @@ export const products = pgTable("products", {
   store_id: uuid("store_id").references(()=> stores.id, {onDelete: "cascade"}).notNull(),
   productName: text().notNull(),
   category: text().notNull(),
-  discount: integer(),
   rating: integer(),
-  price: integer().default(0).notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   description: text(),
-  priceOrigin: integer(),//!!!! talvez esse item não seja aqui
   estoque: integer().default(0).notNull(),
   image: text().notNull(),
   created_at: timestamp("created_at", { withTimezone: true })

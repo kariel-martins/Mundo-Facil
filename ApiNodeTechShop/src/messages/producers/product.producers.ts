@@ -6,7 +6,7 @@ const EXCHANGE = "product.events"
 type productType = {
   email: string;
   product_id: string;
-  price: number;
+  price: string;
   productName: string;
   image: string;
   storeName: string;

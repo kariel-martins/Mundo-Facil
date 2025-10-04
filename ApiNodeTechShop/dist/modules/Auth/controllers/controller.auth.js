@@ -51,7 +51,7 @@ const signIn = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 1000 * 60 * 15
+            maxAge: 1000 * 60 * 60 * 2 // 2 horas
         });
         return res.status(200).json(user.user);
     }
