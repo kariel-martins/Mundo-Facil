@@ -5,7 +5,6 @@ import { AppError } from "../../../errors/AppErro";
 import { authInsert, emailVerification, User } from "../dtos/types.dto.auth";
 
 export class AuthRepository {
-  // helper para centralizar erros
   private async execute<T>(
     fn: () => Promise<T | undefined>,
     message: string,

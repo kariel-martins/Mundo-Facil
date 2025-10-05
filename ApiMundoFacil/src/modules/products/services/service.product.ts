@@ -6,7 +6,6 @@ import { ProductRepository } from "../repositories/repository.product";
 export class ProductService {
   private repo = new ProductRepository();
 
-  // Helper para padronizar tratamento de erros
   private async execute<T>(
     fn: () => Promise<T>,
     message: string,
@@ -21,7 +20,6 @@ export class ProductService {
     }
   }
 
-  // Método auxiliar para notificação
   private async notifyProductCreated(product: productStore): Promise<void> {
     await publishCreateProductRequest({
       email: product.stores.email,
@@ -40,7 +38,6 @@ export class ProductService {
 
       const product = await this.repo.create(data);
 
-      // dispara evento de criação de produto
       await this.notifyProductCreated(product);
 
       return product;

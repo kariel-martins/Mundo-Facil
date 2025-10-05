@@ -24,7 +24,7 @@ app.use((req, res, next) => {
   requestCounter.inc();
   next();
 });
-// Endpoint para Prometheus coletar as métricas
+
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', register.contentType);
   res.end(await register.metrics());

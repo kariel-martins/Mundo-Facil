@@ -80,8 +80,6 @@ export class AuthService {
           token: token,
           expiresAt: userToken.expires_at.toISOString(),
         });
-
-        // retorna user seguro
         const { passwordHash: _, ...safeUser } = auth;
         return { safeUser, token };
       },

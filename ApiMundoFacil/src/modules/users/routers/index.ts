@@ -6,12 +6,13 @@ import {
   getUser,
   updateUser,
 } from "../controllers/user.controller";
+import { Autorization } from "../../../share/middleware/autentication";
 
 const UserRouter = Router();
 
-UserRouter.get("/:user_id", validateUserById, getUser);
-UserRouter.get("/", getAllUser);
-UserRouter.put("/:user_id", validateUserById, updateUser);
-UserRouter.delete("/:user_id", validateUserById, deleteUser);
+UserRouter.get("/:user_id", Autorization,validateUserById, getUser);
+UserRouter.get("/", Autorization,getAllUser);
+UserRouter.put("/:user_id", Autorization,validateUserById, updateUser);
+UserRouter.delete("/:user_id", Autorization,validateUserById, deleteUser);
 
 export { UserRouter };

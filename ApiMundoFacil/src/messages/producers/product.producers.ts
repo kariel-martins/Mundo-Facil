@@ -2,7 +2,6 @@ import { publish } from "../rabbitmq"
 
 const EXCHANGE = "product.events"
 
-//============== Create product ===================
 type productType = {
   email: string;
   product_id: string;

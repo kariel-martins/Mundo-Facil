@@ -3,7 +3,7 @@ import { authRouter } from "./modules/Auth/routers";
 import { productRouter } from "./modules/products/routers";
 import { UserRouter } from "./modules/users/routers";
 import { StoreRouter } from "./modules/stores/routes";
-import { CartRouter } from "./modules/carts/routes.ts";
+import { CartRouter } from "./modules/carts/routes";
 import { OrderRouter } from "./modules/orders/routes";
 
 const router = Router()

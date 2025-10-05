@@ -78,7 +78,7 @@ export class ProductRepository {
       },
       "Erro ao buscar produtos",
       "products/repositories/products.repository.ts/getAll",
-      true // aceita array vazio
+      true
     );
   }
 

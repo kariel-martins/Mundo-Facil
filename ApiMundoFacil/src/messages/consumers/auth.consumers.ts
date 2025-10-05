@@ -1,4 +1,4 @@
-// auth.consumers.ts - MODIFICAR
+
 import { sendEmail } from "../../share/services/EmailService";
 import {
   createContaEmailTemplate,
@@ -25,7 +25,6 @@ type forgotPasswordEventData = {
 const EXCHANGE = "auth.events";
 const DLX = "auth.events.dlx";
 
-//============== Verify Email ================
 const EMAIL_VERIFICATION_QUEUE = "email.verification.send";
 const EMAIL_VERIFICATION_PATTERN = "auth.email.verification.requested";
 
@@ -70,7 +69,6 @@ export async function startEmailVerificationConsumer() {
   }
 }
 
-//================ Forgort Password ==================
 const FORGOT_PASSWORD_QUEUE = "email.forgot.password.send";
 const FORGOT_PASSWORD_PATTERN = "auth.forgot.password.requested";
 
@@ -113,7 +111,7 @@ export async function startForgotPasswordConsumer() {
   }
 }
 
-//================ Resert Password =======================
+
 const RESERT_PASSWORD_QUEUE = "email.reset.password.send";
 const RESERT_PASSWORD_PATTERN = "auth.reset.password.requested";
 

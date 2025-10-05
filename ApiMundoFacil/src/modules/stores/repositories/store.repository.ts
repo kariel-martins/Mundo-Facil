@@ -5,7 +5,6 @@ import { AppError } from "../../../errors/AppErro";
 import { Store, StoreInsert, StoreUpdate } from "../dtos/store.types.store.dto";
 
 export class StoreRepository {
-  // helper para centralizar erros
   private async execute<T>(
     fn: () => Promise<T>,
     message: string,
@@ -62,7 +61,7 @@ export class StoreRepository {
       },
       "Erro ao buscar lojas",
       "stores/repositories/store.repository.ts/getAll",
-      true // permite retornar []
+      true 
     );
   }
 

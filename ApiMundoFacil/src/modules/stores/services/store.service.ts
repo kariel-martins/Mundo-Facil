@@ -5,7 +5,6 @@ import { StoreRepository } from "../repositories/store.repository";
 
 export class StoreService {
   private repo = new StoreRepository();
-  // helper para padronizar tratamento de erros
   private async execute<T>(
     fn: () => Promise<T>,
     message: string,

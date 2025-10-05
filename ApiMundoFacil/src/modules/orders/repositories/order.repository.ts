@@ -49,7 +49,7 @@ export class OrderRepository {
       },
       "Nenhum pedido encontrado",
       "orders/repositories/order.repository.ts/findAllOrders",
-      true // Permitir retorno vazio sem erro
+      true
     );
   }
 

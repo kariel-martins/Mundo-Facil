@@ -1,4 +1,4 @@
-// messages/producers/auth.producers.ts
+
 import crypto from "node:crypto";
 import { publish } from "../rabbitmq";
 
