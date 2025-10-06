@@ -60,7 +60,7 @@ export function ManageProduct() {
   }, [data, updateProduct]);
 
   async function handleProducts(data: ProductDataForm) {
-    console.log(data);
+  
     try {
       await UpdateProducts({ product_id: store_id ?? "", ...data });
       navigate(`/stores/${store_id}`);

@@ -21,6 +21,7 @@ import { PageProduct } from "./pages/pageProduct";
 import { PrivateRoute } from "./hooks/use-private-routes";
 import { CatalogPage } from "./pages/catalog";
 import { ManageProduct } from "./pages/manageProduct";
+import CheckoutPage from "./pages/checkoutPage";
 
 const queryClient = new QueryClient();
 
@@ -39,15 +40,15 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/not-found" element={<Page404 />} />
 
+              <Route path="/checkout" element={<CheckoutPage />} />
+
               <Route path="/main" element={<Main />} />
+              <Route path="/catalog" element={<CatalogPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/products/:product_id" element={<PageProduct />} />
 
               <Route element={<PrivateRoute />}>
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/catalog" element={<CatalogPage />} />
-                <Route
-                  path="/products"
-                  element={<PageProduct />}
-                />
+                <Route path="/products" element={<PageProduct />} />
 
                 <Route path="/carts" element={<Cart />} />
                 <Route path="/orders" element={<Orders />} />
@@ -60,21 +61,11 @@ function App() {
                   path="/stores/:store_id/products/manage/:product_id"
                   element={<ManageProduct />}
                 />
-                <Route
-                  path="/products/:product_id"
-                  element={<PageProduct />}
-                />
-                <Route
-                  path="/stores/cadastro"
-                  element={<CreateStores />}
-                />
+
+                <Route path="/stores/cadastro" element={<CreateStores />} />
                 <Route path="/stores" element={<Store />} />
-                <Route
-                  path="/stores/:store_id"
-                  element={<StoreProducts />}
-                />
+                <Route path="/stores/:store_id" element={<StoreProducts />} />
               </Route>
-              
             </Routes>
           </BrowserRouter>
         </AuthProvider>

@@ -36,11 +36,15 @@ export function SignIn() {
   useEffect(() => {
     if (location.state?.message) {
       setAlert(location.state.message);
-
-      const timer = setTimeout(() => setAlert(null), 5000);
-      return () => clearTimeout(timer);
     }
   }, [location.state]);
+
+  useEffect(()=> {
+    if (alert) {
+     const timer = setTimeout(() => setAlert(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alert])
 
   async function handleSignIn(data: SignInFormData) {
     try {
@@ -57,31 +61,18 @@ export function SignIn() {
       signIn.reset();
     } catch (error: any) {
       if (error.response) {
-        const data = error.response.data;
-
-        if (data.field && data.message) {
-          signIn.setError(data.field as keyof SignInFormData, {
-            type: "server",
-            message: data.message,
-          });
-        } else if (Array.isArray(data.errors)) {
-          data.errors.forEach((err: { field: string; message: string }) => {
-            signIn.setError(err.field as keyof SignInFormData, {
-              type: "server",
-              message: err.message,
-            });
-          });
-        } else if (data.message) {
-          console.error("Erro:", data.message);
-        }
-      }
+        const data = error.response.data as {errors: {default: string}}
+        if (data.errors) {
+          setAlert(data.errors.default);
+        } 
     }
   }
+}
 
   return (
     <div>
       {alert && (
-        <div className="mb-4 p-3 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-md text-center animate-fade-in">
+        <div className="absolute w-screen mb-4 p-3 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-md text-center animate-fade-in">
           {alert}
         </div>
       )}

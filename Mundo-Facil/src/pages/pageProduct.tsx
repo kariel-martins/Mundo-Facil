@@ -51,7 +51,6 @@ export const PageProduct = () => {
 
   const discount = 1 - Number(product.price) / product.priceOrigin;
   const finalPrice = product.price;
-  console.log(typeof data.price )
 
   return (
     <div className="min-h-screen bg-gray-50">
