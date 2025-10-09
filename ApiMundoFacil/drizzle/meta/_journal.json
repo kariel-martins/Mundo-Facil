@@ -43,6 +43,27 @@
       "when": 1759704980206,
       "tag": "0005_sparkling_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1759949073601,
+      "tag": "0006_aspiring_union_jack",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1760027403096,
+      "tag": "0007_red_king_cobra",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1760027577686,
+      "tag": "0008_gifted_blue_shield",
+      "breakpoints": true
     }
   ]
 }

@@ -14,13 +14,13 @@ import {
   validateEmailRequestedSchema,
   validateResetPasswordRequestedSchema
 } from "../dtos/schemas.dto";
-import { Autorization } from "../../../share/middleware/autentication";
+import { Authorization } from "../../../share/middleware/autentication";
 
 const authRouter = Router();
 
 authRouter.post("/signup", validateSignUpRequestedSchema, signUp);
 authRouter.post("/signin", validateSignInRequestedSchema, signIn);
-authRouter.get("/verify", Autorization, verifyAuthentication);
+authRouter.get("/verify", Authorization, verifyAuthentication);
 authRouter.get("/verify-email", validateEmailVerificationRequestedSchema,verifyAuthenticationEmailUser);
 authRouter.post("/forgot-password", validateEmailRequestedSchema, forgotPassword);
 authRouter.post("/reset-password", validateResetPasswordRequestedSchema, resetPassword);

@@ -4,21 +4,6 @@ import { AppError } from "../../../errors/AppErro";
 
 const service = new OrderService();
 
-export const createOrder: RequestHandler = async (req, res) => {
-  try {
-    const data = req.body
-    const order = await service.createOrder(data);
-    return res.status(201).json(order);
-  } catch (error: any) {
-        if (error instanceof AppError) {
-          return res
-          .status(error.statusCode)
-          .json({ errors: { default: error.message } });
-        }
-        return res.status(500).json({message: "Erro ao processar createOrder", context: "orders/controllers/order.controller.ts/createOrder"})
-      }
-};
-
 export const getAllOrders: RequestHandler = async (req, res) => {
   try {
     const { user_id } = req.params

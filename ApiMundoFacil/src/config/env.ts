@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 export function env() {
-  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET", "RABBITMQ_URL", "EMAIL_USER", "EMAIL_PASS", "FRONTEND_URL"] as const;
+  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET", "RABBITMQ_URL", "EMAIL_USER", "EMAIL_PASS", "FRONTEND_URL", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"] as const;
 
   reqVars.forEach((key) => {
     if (!process.env[key])
@@ -17,6 +17,8 @@ export function env() {
     rabbitMQ: process.env.RABBITMQ_URL, 
     emialUser: process.env.EMAIL_USER,
     emialPass: process.env.EMAIL_PASS,
-    urlFrontEnd: process.env.FRONTEND_URL
+    urlFrontEnd: process.env.FRONTEND_URL,
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    stripeWebHoohSecret: process.env.STRIPE_WEBHOOK_SECRET
   };
 }

@@ -5,6 +5,7 @@ import { UserRouter } from "./modules/users/routers";
 import { StoreRouter } from "./modules/stores/routes";
 import { CartRouter } from "./modules/carts/routes";
 import { OrderRouter } from "./modules/orders/routes";
+import { paymentRouter } from "./modules/payments/routes";
 
 const router = Router()
 
@@ -16,5 +17,6 @@ router.use("/api/users", UserRouter)
 router.use("/api/stores", StoreRouter)
 router.use("/api/carts", CartRouter)
 router.use("/api/orders", OrderRouter)
+router.use("/api/payments", paymentRouter)
 
 export { router }

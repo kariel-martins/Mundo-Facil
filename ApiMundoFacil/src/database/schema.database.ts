@@ -83,17 +83,23 @@ export const orders = pgTable("orders", {
   user_id: uuid("user_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
-  store_id: uuid("store_id")
-    .references(() => stores.id, { onDelete: "cascade" })
-    .notNull(),
-  product_id: uuid("product_id")
-    .notNull()
-    .references(() => products.id),
   status: text().notNull().default("Processando"),
-  quantity: integer().notNull().default(0),
+  total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   created_at: timestamp("created_at", { withTimezone: true })
     .notNull()
     .default(sql`NOW()`),
+});
+
+export const order_items = pgTable("order_items", {
+  id: uuid().primaryKey().notNull().defaultRandom(),
+  order_id: uuid("order_id")
+    .references(() => orders.id, { onDelete: "cascade" })
+    .notNull(),
+  product_id: uuid("product_id")
+    .references(() => products.id, { onDelete: "cascade" })
+    .notNull(),
+  quantity: integer("quantity").notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
 });
 
 export const promotions = pgTable("promotions", {
