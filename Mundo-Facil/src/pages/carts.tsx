@@ -7,9 +7,8 @@ import {
   removeMutateCart,
   updatemutateCart,
 } from "@/hooks/carts/mutations/cart.mutate";
-import { createMutateOrders } from "@/hooks/orders/mutations/orders.mutate";
 import { Trash, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 type UpdataQuantProps = {
   quant: "add" | "down";
@@ -18,6 +17,7 @@ type UpdataQuantProps = {
 };
 
 export function Cart() {
+  const navigate = useNavigate()
   const { user } = useAuth();
   const { mutateAsync: updateCart } = updatemutateCart();
   const { mutateAsync: removeIten } = removeMutateCart();
@@ -26,7 +26,6 @@ export function Cart() {
     isLoading,
     isError,
   } = getMutateCart(user?.user_id ?? "");
-  const { mutateAsync: createdOrder } = createMutateOrders();
 
   const subtotal =
     cartItems?.reduce(
@@ -35,15 +34,7 @@ export function Cart() {
     ) || 0;
 
   async function checkoutCart() {
-    cartItems?.map((item) => {
-      createdOrder({
-        product_id: item.products.id,
-        store_id: item.products.store_id,
-        quantity: item.carts.quantity,
-        user_id: item.carts.user_id,
-        status: "Processando",
-      });
-    });
+    navigate("/checkout")
   }
 
   async function UpdateQuantItenCart({

@@ -21,7 +21,9 @@ import { PageProduct } from "./pages/pageProduct";
 import { PrivateRoute } from "./hooks/use-private-routes";
 import { CatalogPage } from "./pages/catalog";
 import { ManageProduct } from "./pages/manageProduct";
-import CheckoutPage from "./pages/checkoutPage";
+import { CheckoutPage } from "./pages/checkoutPage";
+import { PaymentCancelledPage } from "./pages/CancellationPage";
+import { SuccessPage } from "./pages/SuccessPage";
 
 const queryClient = new QueryClient();
 
@@ -40,13 +42,15 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/not-found" element={<Page404 />} />
 
-              <Route path="/checkout" element={<CheckoutPage />} />
 
-              <Route path="/main" element={<Main />} />
+              <Route path="/" element={<Main />} />
               <Route path="/catalog" element={<CatalogPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/products/:product_id" element={<PageProduct />} />
 
+              <Route path="/checkout/success" element={<SuccessPage />} />
+              <Route path="/checkout/cancel" element={<PaymentCancelledPage />} />
+              
               <Route element={<PrivateRoute />}>
                 <Route path="/products" element={<PageProduct />} />
 
@@ -62,6 +66,8 @@ function App() {
                   element={<ManageProduct />}
                 />
 
+                <Route path="/checkout" element={<CheckoutPage />} />
+                
                 <Route path="/stores/cadastro" element={<CreateStores />} />
                 <Route path="/stores" element={<Store />} />
                 <Route path="/stores/:store_id" element={<StoreProducts />} />

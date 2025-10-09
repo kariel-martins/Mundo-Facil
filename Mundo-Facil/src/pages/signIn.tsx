@@ -57,7 +57,7 @@ export function SignIn() {
           name: result.name,
         })
       );
-      navigate(`/main`);
+      navigate(`/`);
       signIn.reset();
     } catch (error: any) {
       if (error.response) {

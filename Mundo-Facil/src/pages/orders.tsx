@@ -21,7 +21,6 @@ export function Orders() {
   };
 
   return (
-    // Fundo limpo
     <div>
       <Navbar />
       <div className="min-h-screen p-8 bg-gray-50">

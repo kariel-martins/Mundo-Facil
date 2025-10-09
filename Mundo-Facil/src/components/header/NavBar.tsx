@@ -40,7 +40,7 @@ export function Navbar() {
         <div className="flex items-center justify-between">
           
           {/* Logo  */}
-          <Link to="/main" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="text-3xl font-extrabold tracking-tight text-gray-800">
               MUNDO <span className="text-blue-400">FÁCIL</span>
             </div>
@@ -49,7 +49,7 @@ export function Navbar() {
           {/* Desktop Navigation  */}
           <div className="hidden md:flex items-center space-x-8 text-gray-700 font-medium">
             <Link
-              to="/main"
+              to="/"
               className="hover:text-blue-400 transition-colors duration-200"
             >
               Início
@@ -158,7 +158,7 @@ export function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden mt-4 space-y-2 rounded-lg p-4 bg-gray-50 border border-gray-200 shadow-inner">
             <Link
-              to={"/main"}
+              to={"/"}
               className="block py-2 text-gray-700 hover:text-blue-400 transition-colors"
             >
               Início

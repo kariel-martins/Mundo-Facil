@@ -3,7 +3,7 @@ import { Navbar } from "@/components/header/NavBar";
 import { Button } from "@/components/ui/button";
 import { getByIdMutateProducts } from "@/hooks/products/mutation/product.mutate";
 import { Link, useParams } from "react-router-dom";
-import { Truck, ShieldCheck, Star, Zap, Minus, Plus } from "lucide-react";
+import { Truck, ShieldCheck, Star, Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ButtonAddCart } from "@/components/ButtoAddCart";
@@ -120,8 +120,7 @@ export const PageProduct = () => {
 
               {/* Preço Final */}
               <p className="text-5xl font-extrabold text-gray-800">
-                R${" "}
-                <span className="text-blue-500">{finalPrice}</span>
+                R$ <span className="text-blue-500">{finalPrice}</span>
               </p>
 
               {/* Contador de Quantidade */}
@@ -151,12 +150,6 @@ export const PageProduct = () => {
                   </Button>
                 </div>
               </div>
-
-              {/* Botão Comprar */}
-              <Button className="w-full text-lg font-semibold py-3 rounded-lg transition-all duration-300 mb-3 bg-blue-400 hover:bg-blue- text-white shadow-md shadow-blue-400/50">
-                <Zap className="h-5 w-5 mr-2" />
-                Comprar Agora
-              </Button>
 
               {/* Botão Adicionar ao Carrinho */}
               <ButtonAddCart

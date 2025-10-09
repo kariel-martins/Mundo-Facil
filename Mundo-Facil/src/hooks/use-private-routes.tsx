@@ -19,7 +19,6 @@ export const PrivateRoute = () => {
         setIsAuthenticated({ ok: response.data.ok });
       } catch (error) {
         setIsAuthenticated({ ok: false });
-
       }
     };
 
