@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 export function SuccessPage() {
-  // Dados de Exemplo (Em um app real, seriam passados por props/contexto/URL)
+ 
   const orderData = {
     orderId: "PED-12345678-ABCD",
     totalValue: "R$ 149,90",
@@ -44,7 +44,7 @@ export function SuccessPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-        <Link to="/minha-conta/pedidos">
+        <Link to="/orders">
           <Button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-colors flex items-center">
             <ShoppingCartIcon className="w-5 h-5 mr-2" />
             Acompanhar Pedido

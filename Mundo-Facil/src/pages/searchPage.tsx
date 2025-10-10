@@ -26,7 +26,7 @@ export function SearchPage() {
     );
 
   function handleProductClick(id: string) {
-    navigate(`/products?id=${id}`);
+    navigate(`/products/${id}`);
   }
 
   const getProductDetails = (product: ProductData) => ({

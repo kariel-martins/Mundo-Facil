@@ -33,6 +33,7 @@ export function CheckoutForm({ total, data }: CheckoutFormProps) {
       },
       redirect: "if_required",
     });
+    console.log(paymentIntent)
 
     if (error) {
       console.error("[Stripe Error]", error);
@@ -47,7 +48,7 @@ export function CheckoutForm({ total, data }: CheckoutFormProps) {
     } else if (paymentIntent?.status === "succeeded") {
       setStatus("Pagamento aprovado! ✅");
       data.map( cart => clearCart(cart.carts.id) )
-      navigate("/checkout/success")
+      navigate(`/checkout/success`)
     } else {
       setStatus(`Status: ${paymentIntent?.status ?? "desconhecido"}`);
       setIsProcessing(false);

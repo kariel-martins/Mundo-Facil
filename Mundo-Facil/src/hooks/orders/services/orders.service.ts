@@ -1,9 +1,10 @@
 import { axiosInstance } from "@/lib/axios";
-import type { OrderRequest, OrderResponce } from "@/types/orders";
+import type { OrderResponce } from "@/types/orders";
 
 export class OrderServices {
-  async create(data: OrderRequest): Promise<OrderResponce> {
-    const result = await axiosInstance.post("/orders", data);
+
+  async getAll(users_id: string): Promise<OrderResponce[]> {
+    const result = await axiosInstance.get(`/orders/${users_id}`);
     return result.data;
   }
 
