@@ -12,12 +12,14 @@ const DLX = "orders.events.dlx";
 const ORDER_CREATED_QUEUE = "order.created.send";
 const ORDER_CREATED_PATTERN = "order.created.requested";
 
-type createOrder = {
-  email: string;
-  productImage: string;
-  ProductName: string;
-  storeName: string;
+type OrderItemsEmail = {
+   productImage: string; productName: string; price: string
 };
+
+interface createOrder {
+  email: string;
+  orders: OrderItemsEmail[];
+}
 
 export async function startOrderCreateConsumer() {
   try {
@@ -37,11 +39,7 @@ export async function startOrderCreateConsumer() {
         await sendEmail(
           event.email,
           "Pedido Feito",
-          orderCreatedEmailTemplate(
-            event.ProductName,
-            event.productImage,
-            event.storeName
-          )
+          orderCreatedEmailTemplate(event.orders)
         );
         ch.ack(msg);
         console.log("✅ E-mail de verificação enviado:", event.email);

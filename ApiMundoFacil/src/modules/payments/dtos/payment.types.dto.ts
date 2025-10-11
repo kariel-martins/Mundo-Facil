@@ -16,15 +16,20 @@ export type OrderInsert = InferInsertModel<typeof orders>;
 
 export type updateOrder = Partial<OrderInsert>;
 
-export type insertOrderProduct = InferInsertModel<typeof order_items>
+export type insertOrderProduct = InferInsertModel<typeof order_items>;
 
-export type OrderItems = InferSelectModel<typeof order_items>
+export type OrderItems = InferSelectModel<typeof order_items>;
 
 export type OrderStoreProductsCarts = {
   orders: Order;
   stores: InferInsertModel<typeof stores>;
   products: InferInsertModel<typeof products>;
   carts: InferInsertModel<typeof carts>;
+};
+
+export type OrderUsers = {
+  orders: Order;
+  users: InferInsertModel<typeof users>;
 };
 
 export type OrderProductsUsersCarts = {

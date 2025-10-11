@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
 import { AppError } from "../../../errors/AppErro";
-import { carts, orders, products, stores, users } from "../../../database/schema.database";
-import { Order, OrderInsert, OrderProductsUsersCarts, OrderStoreProductsCarts, OrderUpdate } from "../dtos/order.type.dto";
+import { order_items, orders, products } from "../../../database/schema.database";
+import { Order, OrderItems, OrderUpdate } from "../dtos/order.type.dto";
 
 export class OrderRepository {
   private async execute<T>(
@@ -29,11 +29,22 @@ export class OrderRepository {
     }
   }
   
-  public async findAllOrders(user_id: string): Promise<OrderStoreProductsCarts[]> {
+  public async findAllOrders(user_id: string): Promise<Order[]> {
     return this.execute(
       async () => {
-      
-        const result = await db.select().from(orders).innerJoin(carts, eq(carts.user_id, orders.user_id)).innerJoin(products, eq(products.id, carts.product_id)).innerJoin(stores, eq(stores.id, products.store_id)).where(eq(orders.user_id, user_id));
+        const result = await db.select().from(orders).where(eq(orders.user_id, user_id))
+        return result;
+      },
+      "Nenhum pedido encontrado",
+      "orders/repositories/order.repository.ts/findAllOrders",
+      true
+    );
+  }
+
+  public async findAllOrdersItems(order_id: string): Promise<OrderItems[]> {
+    return this.execute(
+      async () => {
+        const result = await db.select().from(order_items).where(eq(order_items.order_id, order_id)).innerJoin(products, eq(products.id, order_items.product_id));
         return result;
       },
       "Nenhum pedido encontrado",

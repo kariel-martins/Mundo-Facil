@@ -1,14 +1,14 @@
 import { publish } from "../rabbitmq";
 
 const EXCHANGE = "orders.events";
-
-type createOrder = {
-    email: string,
-    productImage: string,
-    ProductName: string,
-    storeName: string,
+type OrderItemsEmail = {
+   productImage: string; productName: string; price: string
 };
 
+interface createOrder {
+  email: string;
+  orders: OrderItemsEmail[];
+}
 export async function publishCreateOrderResquest(data: createOrder) {
   const event = {
     ...data,

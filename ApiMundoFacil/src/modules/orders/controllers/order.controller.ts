@@ -19,6 +19,21 @@ export const getAllOrders: RequestHandler = async (req, res) => {
       }
 };
 
+export const getAllOrdersItems: RequestHandler = async (req, res) => {
+  try {
+    const { order_id } = req.params
+    const orders = await service.getAllOrdersItems(order_id);
+    return res.status(200).json(orders);
+  } catch (error: any) {
+        if (error instanceof AppError) {
+          return res
+          .status(error.statusCode)
+          .json({ errors: { default: error.message } });
+        }
+        return res.status(500).json({message: "Erro ao processar getAllOrdersItems", context: "orders/controllers/order.controller.ts/getAllOrdersItems"})
+      }
+};
+
 export const updateOrder: RequestHandler = async (req, res) => {
   try {
     const { order_id } = req.params;

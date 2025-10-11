@@ -13,10 +13,18 @@ export const validateOrderSchemaCreate = validation((getSchema) => ({
   ),
 }));
 
-export const validateOrderSchemaById = validation((getSchema) => ({
+export const validateOrderSchemaByIdUsers = validation((getSchema) => ({
   params: getSchema(
     z.object({
       user_id: constValidation.id,
+    })
+  ),
+}));
+
+export const validateOrderSchemaByIdOrders = validation((getSchema) => ({
+  params: getSchema(
+    z.object({
+      order_id: constValidation.id,
     })
   ),
 }));

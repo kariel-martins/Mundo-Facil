@@ -3,6 +3,7 @@ import { router } from "./route";
 import { Counter, register } from "prom-client"
 import cors from "cors"
 import {env} from "./config/env"
+import { webhookRouter } from "./modules/payments/controllers/payment.controller.webhook";
 
 const app = express();
 const { urlFrontEnd } = env()
@@ -17,6 +18,9 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
    credentials: true     
 }));
+
+app.use("/api/payments",webhookRouter)
+
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 

@@ -1,7 +1,8 @@
 import { AppError } from "../../../errors/AppErro";
-import { publishCreateOrderResquest } from "../../../messages/producers/orders.producers";
-import { Order, OrderInsert, OrderProductsUsersCarts, OrderStoreProductsCarts, OrderUpdate } from "../dtos/order.type.dto";
+import { Order, OrderUpdate, OrderItems } from "../dtos/order.type.dto";
 import { OrderRepository } from "../repositories/order.repository";
+
+type OrderResponce = Omit<Order, "user_id">
 
 export class OrderService {
   private repo = new OrderRepository();
@@ -20,7 +21,7 @@ export class OrderService {
     }
   }
 
-  public async getAllOrders(user_id: string): Promise<OrderStoreProductsCarts[]> {
+  public async getAllOrders(user_id: string): Promise<OrderResponce[]> {
     return this.execute(
       async () => {
         return await this.repo.findAllOrders(user_id);
@@ -30,10 +31,20 @@ export class OrderService {
     );
   }
 
+  public async getAllOrdersItems(order_id: string): Promise<OrderItems[]> {
+    return this.execute(
+      async () => {
+        return await this.repo.findAllOrdersItems(order_id);
+      },
+      "Erro ao buscar pedidos",
+      "orders/services/order.service.ts/getAllOrders"
+    );
+  }
+
   public async updateOrder(
     order_id: string,
     data: OrderUpdate
-  ): Promise<Order> {
+  ): Promise<OrderResponce> {
     return this.execute(
       async () => {
         const order = await this.repo.updateOrder(order_id, data);
@@ -45,7 +56,7 @@ export class OrderService {
     );
   }
 
-  public async deleteOrder(order_id: string): Promise<Order> {
+  public async deleteOrder(order_id: string): Promise<OrderResponce> {
     return this.execute(
       async () => {
         const order = await this.repo.deleteOrder(order_id);

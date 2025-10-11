@@ -3,12 +3,14 @@ import { db } from "../../../database/client.database";
 import {
   order_items,
   orders,
+  users,
 } from "../../../database/schema.database";
 import {
   insertOrder,
   insertOrderProduct,
   Order,
   OrderItems,
+  OrderUsers,
   updateOrder,
 } from "../dtos/payment.types.dto";
 import { AppError } from "../../../errors/AppErro";
@@ -31,10 +33,11 @@ export class PaymentRepository {
       throw new AppError(message, 500, context);
     }
   }
-  public async createOrder(data: insertOrder): Promise<Order> {
+  public async createOrder(data: insertOrder): Promise<OrderUsers> {
     return this.execute(
       async () => {
-        const [result] = await db.insert(orders).values(data).returning();
+        const [newOrder] = await db.insert(orders).values(data).returning();
+        const [result] = await db.select().from(orders).where(eq(orders.id, newOrder.id)).innerJoin(users, eq(users.id, newOrder.user_id))
         return result;
       },
       "Erro ao cadastrar o pedido",
@@ -45,7 +48,9 @@ export class PaymentRepository {
   public async createOrderProduct(data: insertOrderProduct): Promise<OrderItems[]> {
     return this.execute(
       async ()=> {
+        console.log("dados passadoa para order_items",data)
         const result = await db.insert(order_items).values(data).returning()
+        console.log("resultado de order_items", result)
         return result
       }, "Erro ao inserir items ao pedido","payment/repositories/createOrderProduct"
     )
