@@ -3,19 +3,18 @@ import { OrderServices } from "../services/orders.service";
 
 const service = new OrderServices();
 
-export function getByIdMutateOrders(order_id: string) {
+export function getAllMutateOrders(user_id: string) {
   return useQuery({
-    queryKey: ["orders"],
-    queryFn: () => service.getById(order_id),
+    queryKey: ["orders", user_id],
+    queryFn: () => service.getAll(user_id),
     refetchOnMount: true,
-    enabled: !!order_id,
+    enabled: !!user_id,
   });
 }
-
-export function getAllMutateOrders(order_id: string) {
+export function getAllItemsMutateOrders(order_id: string) {
   return useQuery({
-    queryKey: ["orders"],
-    queryFn: () => service.getById(order_id),
+    queryKey: ["order_items", order_id],
+    queryFn: () => service.getAllItems(order_id),
     refetchOnMount: true,
     enabled: !!order_id,
   });
