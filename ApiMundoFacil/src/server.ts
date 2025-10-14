@@ -7,6 +7,7 @@ import {
 } from "./messages/consumers/auth.consumers";
 import { startCreateStoreRequest } from "./messages/consumers/store.consumers";
 import { startOrderCreateConsumer } from "./messages/consumers/orders.consumers";
+import { startPaymentsCreateConsumer } from "./messages/consumers/payments.consumers";
 
 const dataEnv = env();
 
@@ -16,9 +17,10 @@ async function bootstrap() {
   await startResertPasswordConsumer();
   await startCreateStoreRequest();
   await startOrderCreateConsumer()
+  await startPaymentsCreateConsumer();
 
   
-  await app.listen(dataEnv.port, () => {
+  app.listen(dataEnv.port, () => {
     console.log("servido rodando!!!");
   });
 }

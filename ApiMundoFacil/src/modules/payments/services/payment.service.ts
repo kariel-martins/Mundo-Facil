@@ -2,8 +2,10 @@ import Stripe from "stripe";
 import { PaymentRepository } from "../repositories/payment.repository";
 import { AppError } from "../../../errors/AppErro";
 import { env } from "../../../config/env";
-import { createOrders } from "../dtos/payment.types.dto";
 import { publishCreateOrderResquest } from "../../../messages/producers/orders.producers";
+import { CreatePaymentType } from "../../../types/payments";
+import { publishCreatePaymentRequest } from "../../../messages/producers/payments.producers";
+import { redis } from "../../../database/redis";
 
 const { stripeSecretKey, stripeWebHoohSecret } = env();
 
@@ -20,54 +22,10 @@ export { stripe };
 export class PaymentService {
   private repo = new PaymentRepository();
 
-  async createPaymentIntent(data: createOrders) {
-    try {
-      if (!data.carts?.length) throw new AppError("Carrinho vazio.");
-
-      const totalAmount = Number(data.total) * 100; // centavos
-
-      const itensCarts = data.carts.map((item)=> ({
-        productImage: item.products.image,
-        productName: item.products.productName,
-        price: item.products.price,
-        product_id: item.products.id,
-        quantity: item.carts.quantity,
-      }))
-
-      const productSummary = data.carts
-        .map(
-          (item) =>
-            `${item.products.productName} (x${item.carts.quantity ?? 1}) - R$${Number(
-              item.products.price
-            ).toFixed(2)}`
-        )
-        .join(", ")
-        .slice(0, 500);
-
-      const paymentIntent = await stripe.paymentIntents.create(
-        {
-          amount: Math.round(totalAmount),
-          currency: "brl",
-          automatic_payment_methods: { enabled: true },
-          payment_method_options: {
-            card: { installments: { enabled: true } },
-          },
-          metadata: {
-            userId: data.user_id,
-            products: productSummary,
-            carts: JSON.stringify(itensCarts),
-          },
-        },
-        {
-          idempotencyKey: `payment-${data.user_id}-${Date.now()}`,
-        }
-      );
-
-      return { clientSecret: paymentIntent.client_secret };
-    } catch (error) {
-      console.error("Erro ao criar PaymentIntent:", error);
-      throw new AppError("Erro ao criar PaymentIntent");
-    }
+  async createPaymentIntent(data: CreatePaymentType) {
+   await publishCreatePaymentRequest(data)
+   const value = await redis.get("stripe:clientSecret")
+    return { clientSecret: value };
   }
 
   async stripeWebhook(sig: string, data: any) {

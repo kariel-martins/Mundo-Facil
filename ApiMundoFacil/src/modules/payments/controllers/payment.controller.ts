@@ -8,7 +8,6 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
   try {
     const data = req.body;
     const clientSecret = await service.createPaymentIntent(data);
-
     return res.json(clientSecret);
   } catch (error) {
     if (error instanceof AppError) {
