@@ -83,11 +83,6 @@ export function Orders() {
                       </p>
                     </div>
                   </div>
-
-                  {/* Aqui você pode adicionar um botão de Acompanhar/Ver Detalhes, se houver */}
-                  {/* <div className="text-right pt-2">
-                     <button className="text-sm font-medium text-blue-500 hover:text-blue-700">Ver Detalhes</button>
-                  </div> */}
                 </CardContent>
               </Card>
             ))}

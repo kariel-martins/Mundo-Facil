@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { ProductSummary } from "@/components/ProductSummary";
@@ -20,6 +20,9 @@ export function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ evita múltiplas chamadas à API
+  const hasRequested = useRef(false);
+
   const total =
     cartItens?.reduce(
       (sum, item) => sum + Number(item.products.price) * item.carts.quantity,
@@ -27,10 +30,12 @@ export function CheckoutPage() {
     ) ?? 0;
 
   useEffect(() => {
-    if (!userId || !cartItens?.length || clientSecret) {
+    if (!userId || !cartItens?.length || hasRequested.current) {
       setLoading(false);
       return;
     }
+
+    hasRequested.current = true; // garante execução única
 
     (async () => {
       try {
@@ -39,8 +44,12 @@ export function CheckoutPage() {
           total,
           carts: cartItens,
         });
-        if (response?.clientSecret) {
-          setClientSecret(response.clientSecret);
+
+        const clientSecret =
+          response?.data?.clientSecret ?? response?.clientSecret;
+
+        if (clientSecret) {
+          setClientSecret(clientSecret);
         }
       } catch (err) {
         console.error("Erro ao criar PaymentIntent:", err);

@@ -24,6 +24,7 @@ import { ManageProduct } from "./pages/manageProduct";
 import { CheckoutPage } from "./pages/checkoutPage";
 import { PaymentCancelledPage } from "./pages/CancellationPage";
 import { SuccessPage } from "./pages/SuccessPage";
+import { LogoutPage } from "./pages/logoutPage";
 
 const queryClient = new QueryClient();
 
@@ -48,8 +49,7 @@ function App() {
               <Route path="/search" element={<SearchPage />} />
               <Route path="/products/:product_id" element={<PageProduct />} />
 
-              <Route path="/checkout/success" element={<SuccessPage />} />
-              <Route path="/checkout/cancel" element={<PaymentCancelledPage />} />
+             
               
               <Route element={<PrivateRoute />}>
                 <Route path="/products" element={<PageProduct />} />
@@ -67,10 +67,15 @@ function App() {
                 />
 
                 <Route path="/checkout" element={<CheckoutPage />} />
+                 <Route path="/checkout/success" element={<SuccessPage />} />
+              <Route path="/checkout/cancel" element={<PaymentCancelledPage />} />
                 
                 <Route path="/stores/cadastro" element={<CreateStores />} />
                 <Route path="/stores" element={<Store />} />
                 <Route path="/stores/:store_id" element={<StoreProducts />} />
+
+                <Route path="/logout" element={<LogoutPage/>} />
+                
               </Route>
             </Routes>
           </BrowserRouter>
