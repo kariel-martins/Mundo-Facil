@@ -88,6 +88,7 @@ services:
   node-application-monitoring-app:
     build:
       context: ./ApiMundoFacil
+      dockerfile: Dockerfile
     container_name: api_node_techshop
     restart: always
     ports:
@@ -106,6 +107,7 @@ services:
   react-application-mundo-facil:
     build:
       context: ./Mundo-Facil
+      dockerfile: Dockerfile
     container_name: mundo_facil
     ports:
       - "4173:4173"
@@ -121,6 +123,7 @@ services:
   nginx:
     build: 
       context: ./nginx
+      dockerfile: Dockerfile
     container_name: mundo_facil_nginx
     volumes:
       - react_build:/usr/share/nginx/html
