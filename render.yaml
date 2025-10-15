@@ -1,0 +1,94 @@
+services:
+
+  - type: web
+    name: mundo-facil-frontend
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Mundo-Facil/Dockerfile
+    buildCommand: npm install && npm run build
+    startCommand: nginx -g 'daemon off;'
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+
+
+  - type: web
+    name: api-mundo-facil
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./ApiMundoFacil/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: postgres-db
+          property: host
+      - key: DB_USER
+        fromService:
+          type: pserv
+          name: postgres-db
+          property: user
+      - key: DB_PASS
+        fromService:
+          type: pserv
+          name: postgres-db
+          property: password
+      - key: DB_NAME
+        fromService:
+          type: pserv
+          name: postgres-db
+          property: database
+    autoDeploy: true
+
+  - type: web
+    name: nginx-proxy
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./nginx/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /api/(.*)
+        destination: https://api-mundo-facil.onrender.com/$1
+      - type: rewrite
+        source: /(.*)
+        destination: https://mundo-facil-frontend.onrender.com/$1
+
+  - type: pserv
+    name: postgres-db
+    plan: free
+    region: oregon
+    env: postgres
+    disk:
+      name: pgdata
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  - type: web
+    name: prometheus
+    env: docker
+    plan: free
+    region: oregon
+    dockerCommand: |
+      docker run -v ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+    autoDeploy: false
+
+  - type: web
+    name: grafana
+    env: docker
+    plan: free
+    region: oregon
+    dockerCommand: |
+      docker run -p 3001:3000 grafana/grafana
+    autoDeploy: false
