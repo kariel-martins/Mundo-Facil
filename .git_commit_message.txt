@@ -1,0 +1,31 @@
+﻿[DOC] Commit explicando alterações do projeto
+
+Resumo:
+- Organizado e atualizado arquivos do backend `ApiMundoFacil` (Dockerfile, .gitignore, seeds, serviços de autenticação/JWT, configuração do Prometheus removida/alterada)
+- Ajustes no frontend `Mundo-Facil` (Dockerfile, páginas e vite.config)
+- Adicionados arquivos de infra no repositório raiz: `docker-compose.yml`, pasta `nginx/` e `prometheus/` (não rastreados anteriormente)
+
+Detalhamento por subprojeto:
+
+ApiMundoFacil (backend):
+- Removido/Marcação como deletado: `.env.test`, `prometheus.yml` e `prometheus/prometheus.yml` (provavelmente reorganização de configuração de monitoramento/instrumentação).
+- Atualizado: `.gitignore` (modificações no gerenciamento de arquivos ignorados) e `Dockerfile` (ajustes na imagem de container/back-end).
+- Atualizado: `src/database/seed/produtos.json` (atualização dos dados seed dos produtos).
+- Atualizado: `src/modules/Auth/services/service.auth.ts` (melhorias/ajustes na lógica de autenticação).
+- Atualizado: `src/share/services/JWTService.ts` (alterações no serviço de JWT; revisar compatibilidade com Auth).
+
+Mundo-Facil (frontend):
+- Modificado: `Dockerfile` (ajustes na construção/serving do app front-end).
+- Modificado: `src/pages/createStores.tsx`, `src/pages/main.tsx` (alterações de UI/rotas/funcionalidades).
+- Modificado: `vite.config.ts` (configurações de build/alias/servidor alteradas).
+
+Infra (raiz do repositório):
+- Novos/Não rastreados: `docker-compose.yml` (adicionado), `nginx/` (diretório com `Dockerfile` e `nginx.conf`), `prometheus/` (diretório com `prometheus.yml`).
+
+Observações / Ações recomendadas:
+- Revisar mudanças no `JWTService` e `service.auth.ts` para garantir compatibilidade e testes de autenticação.
+- Confirmar se os `prometheus.yml` removidos foram movidos para `prometheus/` (há duplicidade aparente).
+- Verificar se `.env.test` deve ser realmente removido do repositório ou apenas movido para um local seguro/ignorado.
+- Testar build dos containers Docker e do projeto frontend após esse commit.
+
+Assinado: commit automático gerado por script/agent em 'master'

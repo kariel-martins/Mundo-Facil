@@ -103,7 +103,8 @@ export class AuthService {
 
         const uid = user.id;
         if (!uid) throw new AppError("Id não encontrado");
-        const token = await this.tokenService.signToken(uid, 15);
+        const time = 2 * 60 //horas
+        const token = await this.tokenService.signToken(uid, time);
 
         const maskDataUser = {
           user: {

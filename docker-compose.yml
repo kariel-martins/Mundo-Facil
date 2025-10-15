@@ -1,0 +1,134 @@
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+  postgres_data: {}
+  redis_data: {}
+  react_build: {}
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.20.1
+    container_name: prometheus
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    expose:
+      - 9090
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:7.1.5
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    networks:
+      - monitoring
+
+  postgres:
+    image: postgres:17
+    container_name: nodeTechShop_db
+    restart: always
+    env_file: 
+      - ./ApiMundoFacil/.env.prodution
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - monitoring
+  
+  redis:
+    image: redis:7.2
+    container_name: redis_ecommerce
+    env_file: 
+      - ./ApiMundoFacil/.env.prodution
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - monitoring
+
+  node-application-monitoring-app:
+    build:
+      context: ./ApiMundoFacil
+    container_name: api_node_techshop
+    restart: always
+    ports:
+      - "5050:5050"
+    expose:
+      - 5050
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+    env_file: 
+      - ./ApiMundoFacil/.env.prodution
+    networks:
+      - monitoring
+  
+  react-application-mundo-facil:
+    build:
+      context: ./Mundo-Facil
+    container_name: mundo_facil
+    ports:
+      - "4173:4173"
+    environment:
+      VITE_STRIPE_PUBLIC_KEY: pk_test_51SEJ84PXnpVxPqf7Y82n7ko31BmrMtgf0jJXl5z0ucAYm8htS6r4TaJzzgwbQT6WekEjLSHAAhTX6lAnh11UNdJ600JrhhGymw
+    depends_on: 
+      - node-application-monitoring-app
+    volumes:
+      - react_build:/app/dist
+    networks:
+      - monitoring
+
+  nginx:
+    build: 
+      context: ./nginx
+    container_name: mundo_facil_nginx
+    volumes:
+      - react_build:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - node-application-monitoring-app
+      - react-application-mundo-facil
+    networks:
+      - monitoring

@@ -32,8 +32,8 @@ export function CreateStores() {
   async function handleStore(data: StoreDataForm) {
     if (!user?.user_id) return
     try {
-      const result = await CreateStore({ user_id: user?.user_id, ...data });
-      navigate(`/stores/${result.id}`);
+      await CreateStore({ user_id: user?.user_id, ...data });
+      navigate("/stores");
       createStore.reset();
     } catch (error: any) {
       if (error.response) {

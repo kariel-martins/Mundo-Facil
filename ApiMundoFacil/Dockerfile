@@ -13,6 +13,9 @@ RUN npm install
 # Copia o restante da aplicação
 COPY . .
 
+# compila para pasta dist
+RUN npm run build
+
 # Expõe a porta que sua API usa
 EXPOSE 5050
 

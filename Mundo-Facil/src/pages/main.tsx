@@ -30,23 +30,6 @@ export function Main() {
               </button>
             </Link>
           </div>
-
-          <div className="hidden md:block w-36 h-36 text-gray-300 absolute right-16 top-1/2 transform -translate-y-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1}
-              stroke="currentColor"
-              className="w-full h-full"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
-          </div>
         </section>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">

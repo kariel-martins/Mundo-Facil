@@ -27,7 +27,7 @@ export class JWTService {
 
   public async verifyToken(token: string) {
     try {
-      const authToken = await this.verify(token);
+      const authToken = this.verify(token);
       if (
         !authToken ||
         (typeof authToken === "string" &&
@@ -58,7 +58,7 @@ export class JWTService {
   > {
     if (!jwtSecret) return "JWT_SECRET_NOT_FOUND";
     try {
-      const result = await jwt.sign(data, jwtSecret, {
+      const result = jwt.sign(data, jwtSecret, {
         expiresIn: `${expireInMinutes}m`,
       });
       return result;
