@@ -45,7 +45,7 @@ services:
     container_name: nodeTechShop_db
     restart: always
     env_file: 
-      - ./ApiMundoFacil/.env.prodution
+      - ./ApiMundoFacil/.env.staging
     ports:
       - "5432:5432"
     volumes:
@@ -76,7 +76,7 @@ services:
     image: redis:7.2
     container_name: redis_ecommerce
     env_file: 
-      - ./ApiMundoFacil/.env.prodution
+      - ./ApiMundoFacil/.env.staging
     ports:
       - "6379:6379"
     volumes:
@@ -100,7 +100,7 @@ services:
       - rabbitmq
       - redis
     env_file: 
-      - ./ApiMundoFacil/.env.prodution
+      - ./ApiMundoFacil/.env.staging
     networks:
       - monitoring
   
@@ -111,8 +111,9 @@ services:
     container_name: mundo_facil
     ports:
       - "4173:4173"
-    environment:
-      VITE_STRIPE_PUBLIC_KEY: pk_test_51SEJ84PXnpVxPqf7Y82n7ko31BmrMtgf0jJXl5z0ucAYm8htS6r4TaJzzgwbQT6WekEjLSHAAhTX6lAnh11UNdJ600JrhhGymw
+    env_file: 
+      - ./Mundo-Facil/.env.development
+      
     depends_on: 
       - node-application-monitoring-app
     volumes:

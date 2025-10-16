@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 5050
 
 # Comando para iniciar a API
-CMD ["npm", "start"]
+CMD ["npm","run", "start:stag"]

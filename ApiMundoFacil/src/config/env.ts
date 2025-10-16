@@ -1,6 +1,12 @@
+import path from "node:path";
 import { AppError } from "../errors/AppErro";
 import dotenv from "dotenv"
-dotenv.config()
+
+const nodeEnv = process.env.NODE_ENV || "development";
+
+const envPath = path.resolve(process.cwd(), `.env.${nodeEnv}`);
+
+dotenv.config({path: envPath});
 
 function getRequiredEnv(key: string): string {
   const val = process.env[key];

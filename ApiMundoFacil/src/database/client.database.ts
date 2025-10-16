@@ -12,6 +12,7 @@ if (!urlDatabase)
   );
 const pool = new Pool({
   connectionString: urlDatabase,
+  ssl: { rejectUnauthorized: false },
 });
 
 export const db = drizzle(pool);
