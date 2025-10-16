@@ -2,7 +2,6 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { env } from "../config/env";
 import { AppError } from "../errors/AppErro";
 import { Pool } from "pg";
-
 const { urlDatabase } = env();
 
 if (!urlDatabase)

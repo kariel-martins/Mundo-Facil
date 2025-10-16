@@ -14,7 +14,9 @@ if (!urlDatabase)
 export default defineConfig({
     dialect: 'postgresql',
     schema: './src/database/schema.database.ts',
+    out: './drizzle',
     dbCredentials: {
         url: urlDatabase,
+        ssl: true
     }
 })
