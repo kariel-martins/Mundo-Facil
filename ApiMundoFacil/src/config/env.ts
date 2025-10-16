@@ -2,8 +2,14 @@ import { AppError } from "../errors/AppErro";
 import dotenv from "dotenv"
 dotenv.config()
 
+function getRequiredEnv(key: string): string {
+  const val = process.env[key];
+  if (!val) throw new AppError(`Variável de ambiente ${key} não definida`, 500, "config/env.ts");
+  return val;
+}
+
 export function env() {
-  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET", "RABBITMQ_URL", "EMAIL_USER", "EMAIL_PASS", "FRONTEND_URL", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"] as const;
+  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET", "RABBITMQ_URL", "EMAIL_USER", "EMAIL_PASS", "FRONTEND_URL", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "REDIS_URL"] as const;
 
   reqVars.forEach((key) => {
     if (!process.env[key])
@@ -11,14 +17,15 @@ export function env() {
   });
 
   return {
-    port: Number(process.env.PORT) || 3333,
-    urlDatabase: process.env.URL_DATABASE,
-    jwtSecret: process.env.JWT_SECRET,
-    rabbitMQ: process.env.RABBITMQ_URL, 
-    emialUser: process.env.EMAIL_USER,
-    emialPass: process.env.EMAIL_PASS,
-    urlFrontEnd: process.env.FRONTEND_URL,
-    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-    stripeWebHoohSecret: process.env.STRIPE_WEBHOOK_SECRET
+    port: Number(getRequiredEnv("PORT")) || 3333,
+    urlDatabase: getRequiredEnv("URL_DATABASE"),
+    urlRedis: getRequiredEnv("REDIS_URL"),
+    jwtSecret: getRequiredEnv("JWT_SECRET"),
+    rabbitMQ: getRequiredEnv("RABBITMQ_URL"), 
+    emialUser: getRequiredEnv("EMAIL_USER"),
+    emialPass: getRequiredEnv("EMAIL_PASS"),
+    urlFrontEnd: getRequiredEnv("FRONTEND_URL"),
+    stripeSecretKey: getRequiredEnv("STRIPE_SECRET_KEY"),
+    stripeWebHoohSecret: getRequiredEnv("STRIPE_WEBHOOK_SECRET")
   };
 }

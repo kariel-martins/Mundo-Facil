@@ -1,17 +1,16 @@
 import Redis from "ioredis";
+import { env } from "../config/env";
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST || "127.0.0.1",
-  port: Number(process.env.REDIS_PORT) || 6379,
-  password: process.env.REDIS_PASSWORD || undefined,
-});
+const { urlRedis } = env();
 
-redis.on("connect", () => {
-  console.log("✅ Redis conectado com sucesso");
-});
+  const redis = new Redis(urlRedis);
 
-redis.on("error", (err) => {
-  console.error("❌ Erro no Redis:", err);
-});
+  redis.on("connect", () => {
+    console.log("✅ Redis conectado com sucesso");
+  });
 
-export { redis }
+  redis.on("error", (err) => {
+    console.error("❌ Erro no Redis:", err);
+  });
+  
+  export { redis }
