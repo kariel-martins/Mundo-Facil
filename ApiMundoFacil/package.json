@@ -9,11 +9,12 @@
   "scripts": {
     "db:generate": "npx drizzle-kit generate",
     "db:migrate": "npx drizzle-kit migrate",
+    "db:push": "npx drizzle-kit push",
     "seed:products": "ts-node src/database/seed/importProducts.ts",
     "db:studio": "npx drizzle-kit studio",
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js && npm run db:migrate"
+    "start": "npm run db:push && node dist/server.js"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.0",
