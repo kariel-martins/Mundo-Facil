@@ -7,13 +7,13 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts",
-    "start": "node dist/server.js",
-    "build": "tsc",
-    "db:migrate": "npx drizzle-kit migrate",
     "db:generate": "npx drizzle-kit generate",
+    "db:migrate": "npx drizzle-kit migrate",
+    "seed:products": "ts-node src/database/seed/importProducts.ts",
     "db:studio": "npx drizzle-kit studio",
-    "seed:products": "ts-node src/database/seed/importProducts.ts"
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js && npm run db:migrate"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.0",
