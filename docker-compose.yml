@@ -39,52 +39,7 @@ services:
       - 3000
     networks:
       - monitoring
-
-  postgres:
-    image: postgres:17
-    container_name: nodeTechShop_db
-    restart: always
-    env_file: 
-      - ./ApiMundoFacil/.env.staging
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - monitoring
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    restart: always
-    ports:
-      - "5672:5672"   
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-    networks:
-      - monitoring
   
-  redis:
-    image: redis:7.2
-    container_name: redis_ecommerce
-    env_file: 
-      - ./ApiMundoFacil/.env.staging
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: ["redis-server", "--appendonly", "yes"]
-    networks:
-      - monitoring
-
   node-application-monitoring-app:
     build:
       context: ./ApiMundoFacil
@@ -95,10 +50,6 @@ services:
       - "5050:5050"
     expose:
       - 5050
-    depends_on:
-      - postgres
-      - rabbitmq
-      - redis
     env_file: 
       - ./ApiMundoFacil/.env.staging
     networks:
