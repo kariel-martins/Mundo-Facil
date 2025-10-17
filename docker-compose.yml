@@ -51,7 +51,7 @@ services:
     expose:
       - 5050
     env_file: 
-      - ./ApiMundoFacil/.env.staging
+      - ./ApiMundoFacil/.env.production
     networks:
       - monitoring
   

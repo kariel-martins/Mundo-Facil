@@ -14,37 +14,35 @@
     "db:studio": "npx drizzle-kit studio",
     "build": "tsc",
     "start:dev": "cross-env NODE_ENV=development nodemon src/server.ts",
-    "start:prod": "cross-env NODE_ENV=production npm run db:push && node dist/server.js",
-    "start:stag": "cross-env NODE_ENV=staging npm run db:push && node dist/server.js"
+    "start:prod": "npm run db:push && node dist/server.js"
   },
   "devDependencies": {
-  "@types/amqplib": "^0.8.0",
-  "@types/bcryptjs": "^2.4.6",
-  "@types/cors": "2.8.19",
-  "@types/express": "^5.0.3",
-  "@types/jsonwebtoken": "^9.0.10",
-  "@types/node": "^24.3.0",
-  "@types/nodemailer": "7.0.1",
-  "@types/pg": "^8.15.5",
-  "biome": "^0.3.3",
-  "drizzle-kit": "0.31.5",
-  "nodemon": "^3.1.10",
-  "typescript": "^5.9.2"
-},
- "dependencies": {
-  "amqplib": "^0.9.1",
-  "bcryptjs": "^3.0.2",
-  "cross-env": "10.1.0",
-  "cors": "2.8.5",
-  "dotenv": "^17.2.1",
-  "drizzle-orm": "^0.44.5",
-  "express": "^5.1.0",
-  "ioredis": "5.7.0",
-  "jsonwebtoken": "^9.0.2",
-  "nodemailer": "7.0.6",
-  "pg": "^8.16.3",
-  "prom-client": "^15.1.3",
-  "stripe": "19.1.0",
-  "zod": "^4.1.3"
-}
+    "@types/amqplib": "^0.8.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.15.5",
+    "biome": "^0.3.3",
+    "drizzle-kit": "0.31.5",
+    "nodemon": "^3.1.10",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "amqplib": "^0.9.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "2.8.5",
+    "cross-env": "10.1.0",
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.5",
+    "express": "^5.1.0",
+    "ioredis": "5.7.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "prom-client": "^15.1.3",
+    "resend": "6.1.3",
+    "stripe": "19.1.0",
+    "zod": "^4.1.3"
+  }
 }
