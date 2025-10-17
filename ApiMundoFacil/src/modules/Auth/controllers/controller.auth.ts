@@ -50,7 +50,7 @@ export const signIn: RequestHandler = async (req, res) => {
     res.cookie("auth_token", user.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-        sameSite: "strict", 
+        sameSite: "none", 
         maxAge: 1000 * 60 * 60 * 2 // 2 horas
     })
     return res.status(200).json(user.user);
