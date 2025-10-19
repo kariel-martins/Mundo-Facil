@@ -1,9 +1,9 @@
-import { Resend } from "resend";
+import sgMail from '@sendgrid/mail';
 import { env } from "../../config/env";
 
-const { resendKey } = env();
+const { emailUser, sendgridKey } = env();
 
-const resend = new Resend(resendKey);
+sgMail.setApiKey(sendgridKey);
 
 export async function sendEmail(
   to: string,
@@ -12,18 +12,26 @@ export async function sendEmail(
   text?: string
 ) {
   try {
-    const info = await resend.emails.send({
-      from: "Mundo Facíl <no-reply@techshop.dev>",
+    const info = await sgMail.send({
       to,
+      from: `Mundo Facíl <${emailUser}>`,
       subject,
       html,
       text,
     });
 
-    console.log("📧 E-mail enviado com sucesso:", info.data?.id);
+    console.log("📧 E-mail enviado com sucesso");
     return info;
-  } catch (error) {
-    console.error("❌ Erro ao enviar e-mail:", error);
+  } catch (error: any) {
+    console.error("❌ Erro ao enviar e-mail:");
+
+    // ✅ Mostra detalhes do erro vindo do SendGrid (útil para depurar 403)
+    if (error.response?.body?.errors) {
+      console.error(JSON.stringify(error.response.body.errors, null, 2));
+    } else {
+      console.error(error);
+    }
+
     throw new Error("Falha ao enviar e-mail");
   }
 }

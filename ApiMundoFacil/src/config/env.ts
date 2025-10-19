@@ -15,7 +15,7 @@ function getRequiredEnv(key: string): string {
 }
 
 export function env() {
-  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET", "RABBITMQ_URL", "FRONTEND_URL", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "REDIS_URL", "RESEND_API_KEY"] as const;
+  const reqVars = ["PORT", "URL_DATABASE", "JWT_SECRET", "RABBITMQ_URL", "FRONTEND_URL", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "REDIS_URL", "SENDGRID_API_KEY", "EMAIL_USER"] as const;
 
   reqVars.forEach((key) => {
     if (!process.env[key])
@@ -31,6 +31,7 @@ export function env() {
     urlFrontEnd: getRequiredEnv("FRONTEND_URL"),
     stripeSecretKey: getRequiredEnv("STRIPE_SECRET_KEY"),
     stripeWebHoohSecret: getRequiredEnv("STRIPE_WEBHOOK_SECRET"),
-    resendKey: getRequiredEnv("RESEND_API_KEY")
+    sendgridKey: getRequiredEnv("SENDGRID_API_KEY"),
+    emailUser: getRequiredEnv("EMAIL_USER")
   };
 }

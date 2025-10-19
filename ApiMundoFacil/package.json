@@ -30,6 +30,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@sendgrid/mail": "8.1.6",
     "amqplib": "^0.9.1",
     "bcryptjs": "^3.0.2",
     "cors": "2.8.5",
