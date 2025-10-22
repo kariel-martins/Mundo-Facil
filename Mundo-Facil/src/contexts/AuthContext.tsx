@@ -17,6 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserSignInRequestData | null>(null);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -32,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+  window.location.href = "/signIn";
   };
 
   return (
@@ -40,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

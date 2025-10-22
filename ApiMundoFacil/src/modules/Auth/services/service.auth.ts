@@ -87,25 +87,24 @@ export class AuthService {
       "auth/services/service.auth.ts/registerUser"
     );
   }
-  
+
   public async getUser(email: string, password: string): Promise<ResponseUser> {
     return this.execute(
       async () => {
         const user = await this.repo.findByEmail(email, "ativo");
         if (!user.id) throw new AppError("Usuário não encontrado", 404);
-
         const validPassword = await this.crypto.verifyText(
           password,
           user.passwordHash
         );
+
         if (!validPassword)
           throw new AppError("Usuário ou senha inválidos", 401);
-
         const uid = user.id;
-        if (!uid) throw new AppError("Id não encontrado");
-        const time = 2 * 60 //horas
-        const token = await this.tokenService.signToken(uid, time);
 
+        if (!uid) throw new AppError("Id não encontrado");
+        const time = 2 * 60;
+        const token = await this.tokenService.signToken(uid, time);
         const maskDataUser = {
           user: {
             user_id: uid,
@@ -189,10 +188,7 @@ export class AuthService {
           );
 
         const passwordHash = await this.crypto.hashText(password);
-        const updated = await this.updatePasswordUser(
-          user.email,
-          passwordHash
-        );
+        const updated = await this.updatePasswordUser(user.email, passwordHash);
 
         await publishResertPasswordUser(updated.email, updated.name);
 
@@ -214,7 +210,8 @@ export class AuthService {
       throw new AppError("Erro ao gerar a data de expiração", 500);
 
     return this.execute(
-      () => this.repo.emailVerificationCreate(token, expiresAt, user_Id),
+      () =>
+        this.repo.emailVerificationCreate(token, expiresAt, user_Id, "valid"),
       "Não foi possível criar o token de verificação",
       "auth/services/service.auth.ts/createTokenUser"
     );

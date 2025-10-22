@@ -64,3 +64,10 @@ export const validateResetPasswordRequestedSchema = validation((getSchema) => ({
       })
     ),
 }));
+export const validateByIdRequestedSchema = validation((getSchema) => ({
+  params: getSchema(
+      z.object({
+        user_id: z.string(),
+      })
+    ),
+}));

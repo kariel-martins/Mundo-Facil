@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../../database/client.database";
-import { email_verifications, stores, users } from "../../../database/schema.database";
+import { email_verifications, users } from "../../../database/schema.database";
 import { AppError } from "../../../errors/AppErro";
 import { authInsert, emailVerification, User } from "../dtos/types.dto.auth";
 
@@ -37,13 +37,14 @@ export class AuthRepository {
   async emailVerificationCreate(
     tokenHash: string,
     expires_at: Date,
-    user_id: string
+    user_id: string,
+    isValid: string
   ): Promise<emailVerification> {
     return this.execute(
       async () => {
         const result = await db
           .insert(email_verifications)
-          .values({ tokenHash, expires_at, user_id })
+          .values({ tokenHash, expires_at, user_id, isValid})
           .returning();
         return result[0];
       },
@@ -78,8 +79,22 @@ export class AuthRepository {
         const result = await db
           .select()
           .from(email_verifications)
-          .where(eq(email_verifications.user_id, user_id));
+          .where(and(eq(email_verifications.user_id, user_id), eq(email_verifications.isValid, "valid")));
         return result[0];
+      },
+      "Token de verificação não encontrado",
+      "auth/repositories/auth.repository.ts/findByIdTokenVerification"
+    );
+  }
+
+  async findAllTokenUser(user_id: string): Promise<emailVerification[]> {
+    return this.execute(
+      async () => {
+        const result = await db
+          .select()
+          .from(email_verifications)
+          .where(eq(email_verifications.user_id, user_id));
+        return result;
       },
       "Token de verificação não encontrado",
       "auth/repositories/auth.repository.ts/findByIdTokenVerification"
@@ -140,17 +155,23 @@ export class AuthRepository {
     );
   }
 
-  async removeTokenUser(userId: string): Promise<emailVerification> {
+  async updateValidadeToken(isValid: string, user_id: string): Promise<emailVerification> {
     return this.execute(
       async () => {
         const result = await db
-          .delete(email_verifications)
-          .where(eq(email_verifications.user_id, userId))
+          .update(email_verifications)
+          .set({isValid})
+          .where(
+            and(
+              eq(email_verifications.user_id, user_id)
+            )
+          )
           .returning();
         return result[0];
       },
-      "Erro ao remover token de verificação",
-      "auth/repositories/auth.repository.ts/removeTokenUser"
+      "Erro ao atualizar token de autenticação",
+      "auth/repositories/auth.repository.ts/updateAuthenticationToken"
     );
   }
+
 }

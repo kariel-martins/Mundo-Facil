@@ -26,3 +26,7 @@ export async function forgotPassword(data: forgotPasswordData):Promise<void> {
 export async function resetPassword(data: resetPasswordData):Promise<void> {
     await axiosInstance.put('/auth/reset-password', data)
 }
+
+export async function removeAutentication():Promise<void> {
+    await axiosInstance.delete("/auth/remove-token")
+}

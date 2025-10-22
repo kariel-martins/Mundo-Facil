@@ -26,6 +26,7 @@ export const email_verifications = pgTable("email_verifications", {
   user_id: uuid("user_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
+  isValid: text().default("invalid").notNull(),
   tokenHash: text().notNull(),
   expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
   consumed_at: timestamp("consumed_at", { withTimezone: true }),

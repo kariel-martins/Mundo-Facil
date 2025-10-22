@@ -5,14 +5,15 @@ import {
   verifyAuthenticationEmailUser,
   forgotPassword,
   resetPassword,
-  verifyAuthentication
+  verifyAuthentication,
+  removeTokenAutenticationUser
 } from "../controllers/controller.auth";
 import {
   validateSignUpRequestedSchema,
   validateSignInRequestedSchema,
   validateEmailVerificationRequestedSchema,
   validateEmailRequestedSchema,
-  validateResetPasswordRequestedSchema
+  validateResetPasswordRequestedSchema,
 } from "../dtos/schemas.dto";
 import { Authorization } from "../../../share/middleware/autentication";
 
@@ -24,5 +25,6 @@ authRouter.get("/verify", Authorization, verifyAuthentication);
 authRouter.get("/verify-email", validateEmailVerificationRequestedSchema,verifyAuthenticationEmailUser);
 authRouter.post("/forgot-password", validateEmailRequestedSchema, forgotPassword);
 authRouter.post("/reset-password", validateResetPasswordRequestedSchema, resetPassword);
+authRouter.delete("/remove-token", removeTokenAutenticationUser)
 
 export { authRouter };

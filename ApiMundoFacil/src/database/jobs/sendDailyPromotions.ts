@@ -5,6 +5,7 @@ import { users } from "../schema.database";
 import { generalPromotionEmailTemplate } from "../../share/templetes/promotions.stores";
 
 export const sendDailyPromotionsJob = cron.schedule("0 9 * * *", async () => {
+
   console.log("💌 Enviando promoções diárias às 9h...");
   try {
     const result = await db.select().from(users);
@@ -13,5 +14,7 @@ export const sendDailyPromotionsJob = cron.schedule("0 9 * * *", async () => {
             return sendEmail(user.email, "Chegou 📩", generalPromotionEmailTemplate());
         })
     }
-  } catch (error) {}
+  } catch (err) {
+    console.log("❌ Erro ao enviar promoções")
+  }
 });

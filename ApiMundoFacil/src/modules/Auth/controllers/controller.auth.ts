@@ -15,12 +15,10 @@ export const signUp: RequestHandler = async (req, res) => {
         .status(error.statusCode)
         .json({ errors: { default: error.message } });
     }
-    return res
-      .status(500)
-      .json({
-        message: "Erro ao processar signUp",
-        context: "auth/controllers/auth.controller.ts/signUp",
-      });
+    return res.status(500).json({
+      message: "Erro ao processar signUp",
+      context: "auth/controllers/auth.controller.ts/signUp",
+    });
   }
 };
 
@@ -45,12 +43,10 @@ export const verifyAuthenticationEmailUser: RequestHandler = async (
         .status(error.statusCode)
         .json({ errors: { default: error.message } });
     }
-    return res
-      .status(500)
-      .json({
-        message: "Erro ao processar verifyAuthenticationUser",
-        context: "auth/controllers/auth.controller.ts/verifyAuthenticationUser",
-      });
+    return res.status(500).json({
+      message: "Erro ao processar verifyAuthenticationUser",
+      context: "auth/controllers/auth.controller.ts/verifyAuthenticationUser",
+    });
   }
 };
 
@@ -75,12 +71,10 @@ export const signIn: RequestHandler = async (req, res) => {
         .status(error.statusCode)
         .json({ errors: { default: error.message } });
     }
-    return res
-      .status(500)
-      .json({
-        message: "Erro ao processar signIn",
-        context: "auth/controllers/auth.controller.ts/signIn",
-      });
+    return res.status(500).json({
+      message: "Erro ao processar signIn",
+      context: "auth/controllers/auth.controller.ts/signIn",
+    });
   }
 };
 
@@ -95,12 +89,10 @@ export const forgotPassword: RequestHandler = async (req, res) => {
         .status(error.statusCode)
         .json({ errors: { default: error.message } });
     }
-    return res
-      .status(500)
-      .json({
-        message: "Erro ao processar forgotPassword",
-        context: "auth/controllers/auth.controller.ts/forgotPassword",
-      });
+    return res.status(500).json({
+      message: "Erro ao processar forgotPassword",
+      context: "auth/controllers/auth.controller.ts/forgotPassword",
+    });
   }
 };
 
@@ -122,11 +114,38 @@ export const resetPassword: RequestHandler = async (req, res) => {
         .status(error.statusCode)
         .json({ errors: { default: error.message } });
     }
-    return res
-      .status(500)
-      .json({
-        message: "Erro ao processar resetPassword",
-        context: "auth/controllers/auth.controller.ts/resetPassword",
-      });
+    return res.status(500).json({
+      message: "Erro ao processar resetPassword",
+      context: "auth/controllers/auth.controller.ts/resetPassword",
+    });
+  }
+};
+
+export const removeTokenAutenticationUser: RequestHandler = async (
+  req,
+  res
+) => {
+  try {
+    res.clearCookie("auth_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    });
+
+    Object.keys(req.cookies || {}).forEach((cookieName) => {
+      res.clearCookie(cookieName, { path: "/" });
+    });
+
+    return res.status(200).json({ message: "Logout realizado com sucesso" });
+  } catch (error: any) {
+    console.error("Erro ao remover autenticação:", error);
+    return res.status(500).json({
+      errors: {
+        default: "Erro ao processar logout",
+        context:
+          "auth/controllers/auth.controller.ts/removeTokenAutenticationUser",
+      },
+    });
   }
 };

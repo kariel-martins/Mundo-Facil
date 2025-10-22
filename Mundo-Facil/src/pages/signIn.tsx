@@ -18,12 +18,17 @@ import {
 import { InputField } from "@/components/form/input";
 import { signInMutate } from "@/hooks/auth/mutations/auth.mutations";
 import { useEffect, useState } from "react";
+import { IconLoader } from "@/components/ShoppingBag";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function SignIn() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { mutateAsync: SignInHook } = signInMutate();
+  const { mutateAsync: signInAsync, isPending } = signInMutate();
   const [alert, setAlert] = useState<string | null>(null);
+  const { login } = useAuth();
+
+  const [longDelay, setLongDelay] = useState(false);
 
   const signIn = useForm<SignInFormData>({
     resolver: zodResolver(validateSignIn),
@@ -39,35 +44,50 @@ export function SignIn() {
     }
   }, [location.state]);
 
-  useEffect(()=> {
+  useEffect(() => {
     if (alert) {
-     const timer = setTimeout(() => setAlert(null), 5000);
+      const timer = setTimeout(() => setAlert(null), 5000);
       return () => clearTimeout(timer);
     }
-  }, [alert])
+  }, [alert]);
+
+  useEffect(() => {
+    if (!isPending) {
+      setLongDelay(false);
+    }
+  }, [isPending]);
 
   async function handleSignIn(data: SignInFormData) {
+    setAlert(null);
+
+    const LONG_DELAY_THRESHOLD = 10000; // 10s
+    const delayTimer = setTimeout(
+      () => setLongDelay(true),
+      LONG_DELAY_THRESHOLD
+    );
+
     try {
-      const result = await SignInHook(data);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          user_id: result.user_id,
-          email: result.email,
-          name: result.name,
-        })
-      );
-      navigate(`/`);
+      const result = await signInAsync(data);
+      login({
+        user_id: result.user_id,
+        email: result.email,
+        name: result.name,
+      });
+      if (!isPending || !localStorage.getItem("user")) return navigate("/");
       signIn.reset();
     } catch (error: any) {
-      if (error.response) {
-        const data = error.response.data as {errors: {default: string}}
-        if (data.errors) {
-          setAlert(data.errors.default);
-        } 
+      if (error?.response?.data?.errors?.default) {
+        setAlert(error.response.data.errors.default);
+      } else if (error?.message) {
+        setAlert(error.message);
+      } else {
+        setAlert("Erro ao efetuar login. Tente novamente.");
+      }
+    } finally {
+      clearTimeout(delayTimer);
+      setLongDelay(false);
     }
   }
-}
 
   return (
     <div>
@@ -113,12 +133,32 @@ export function SignIn() {
                   placeholder="código secreto"
                   icon={<Lock className="w-5 h-5 text-gray-600" />}
                 />
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-400 hover:bg-blue-500 text-white font-semibold py-3 shadow-md transition-colors"
-                >
-                  Entrar
-                </Button>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="submit"
+                    disabled={isPending}
+                    className="flex-1 w-full bg-blue-400 hover:bg-blue-500 text-white font-semibold py-3 shadow-md transition-colors disabled:opacity-60"
+                  >
+                    {isPending ? "Entrando..." : "Entrar"}
+                  </Button>
+                </div>
+
+                {isPending && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <IconLoader size={20} />
+                    <span className="text-sm text-gray-600">
+                      Processando login...
+                    </span>
+                  </div>
+                )}
+
+                {longDelay && (
+                  <div className="mt-2 text-sm text-gray-700 bg-yellow-50 p-2 rounded">
+                    Está demorando mais do que o normal. Verifique sua conexão
+                    ou tente novamente.
+                  </div>
+                )}
               </form>
             </Form>
 
@@ -127,7 +167,9 @@ export function SignIn() {
                 to="/signUp"
                 className="text-blue-400 hover:text-blue-500 hover:underline transition-colors block font-medium"
               >
-                <span className="font-semibold">Criar Conta no Mundo Fácil</span>
+                <span className="font-semibold">
+                  Criar Conta no Mundo Fácil
+                </span>
               </Link>
               <Link
                 to="/forgot-password"

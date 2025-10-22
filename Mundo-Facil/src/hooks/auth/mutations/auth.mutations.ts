@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { forgotPasswordAService, resetPassword, signInService, signUpService, verifyEmail} from "../services/auth.service"
+import { forgotPasswordAService, removeAutentication, resetPassword, signInService, signUpService, verifyEmail} from "../services/auth.service"
 
 export function sigUpMutate() {
     const queryClient = useQueryClient()
@@ -47,6 +47,16 @@ export function verifyEmailMutate() {
         mutationFn: verifyEmail,
         onSuccess: ()=> {
             queryClient.invalidateQueries({queryKey: ['get-verify-email']})
+        }
+    })
+}
+
+export function removeAutenticationMutate() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: removeAutentication,
+        onSuccess: ()=> {
+            queryClient.invalidateQueries({queryKey: ['remove-authetication']})
         }
     })
 }

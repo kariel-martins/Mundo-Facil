@@ -64,6 +64,13 @@
       "when": 1760027577686,
       "tag": "0008_gifted_blue_shield",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1760996599061,
+      "tag": "0009_premium_lord_hawal",
+      "breakpoints": true
     }
   ]
 }
