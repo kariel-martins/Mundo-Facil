@@ -1,5 +1,6 @@
 import { redis } from "../../database/redis";
 import { AppError } from "../../errors/AppErro";
+import { sendEmail } from "../../share/services/EmailService";
 import { createPayment } from "../../share/services/stripePayment";
 import { CreatePaymentType } from "../../types/payments";
 import {
@@ -29,9 +30,10 @@ export async function startPaymentsCreateConsumer() {
       try {
         const event = JSON.parse(msg.content.toString()) as CreatePaymentType;
         const { clientSecret } = await createPayment(event);
-        if (!clientSecret)
-          throw new AppError("Erro ao encotrar clientSecret", 400);
+        if (!clientSecret) throw new AppError("Erro ao encotrar clientSecret", 400);
+
         await redis.set("stripe:clientSecret", clientSecret, "EX", 300);
+
         ch.ack(msg);
         console.log("✅ Compra iniciada por usuário:", event.user_id);
       } catch (err) {

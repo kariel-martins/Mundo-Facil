@@ -72,7 +72,7 @@ export function productCreatedEmailTemplate(
         <div class="product-card">
           <img src="${productImage}" alt="Imagem do produto ${productName}" />
           <div class="product-name">${productName}</div>
-          <div class="price">R$ ${price.toFixed(2)}</div>
+          <div class="price">R$ ${Number(price).toFixed(2)}</div>
           <div class="meta">Loja: <b>${storeName}</b></div>
           <div class="meta">Data de criação: ${new Date().getFullYear}</div>
         </div>

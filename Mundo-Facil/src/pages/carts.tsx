@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  getMutateCart,
+  useGetCarts,
   removeMutateCart,
   updatemutateCart,
 } from "@/hooks/carts/mutations/cart.mutate";
@@ -25,7 +25,7 @@ export function Cart() {
     data: cartItems,
     isLoading,
     isError,
-  } = getMutateCart(user?.user_id ?? "");
+  } = useGetCarts(user?.user_id ?? "");
 
   const subtotal =
     cartItems?.reduce(

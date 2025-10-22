@@ -20,6 +20,13 @@ export type insertOrderProduct = InferInsertModel<typeof order_items>;
 
 export type OrderItems = InferSelectModel<typeof order_items>;
 
+export type Carts = InferSelectModel<typeof carts>
+
+export type cartsProducts = {
+  carts: Carts
+  products: InferSelectModel<typeof products>
+}
+
 export type OrderStoreProductsCarts = {
   orders: Order;
   stores: InferInsertModel<typeof stores>;

@@ -1,11 +1,14 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../database/client.database";
 import {
+  carts,
   order_items,
   orders,
+  products,
   users,
 } from "../../../database/schema.database";
 import {
+  cartsProducts,
   insertOrder,
   insertOrderProduct,
   Order,
@@ -55,6 +58,15 @@ export class PaymentRepository {
       }, "Erro ao inserir items ao pedido","payment/repositories/createOrderProduct"
     )
 
+  }
+
+  public async getAllCarts(cart_id: string): Promise< cartsProducts >  {
+    return this.execute(
+      async ()=> {
+        const [result] = await db.select().from(carts).where(eq(carts.id, cart_id)).innerJoin(products, eq(products.id, carts.product_id))
+        return result
+      }, "Erro ao processar getAllCarts", "payment/repositories/getAllCarts"
+    )
   }
   public async update(order_id: string, data: updateOrder): Promise<Order> {
     return this.execute(

@@ -3,7 +3,7 @@ import { db } from "../client.database";
 import { email_verifications } from "../schema.database";
 import { eq, lt, or } from "drizzle-orm";
 
-export const clearInvalidTokens = cron.schedule("*/5 * * * *", async () => {
+export const clearInvalidTokens = cron.schedule("0 * * * *", async () => {
   try {
     const now = new Date();
     const result = await db

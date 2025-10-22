@@ -20,17 +20,6 @@ export class ProductService {
     }
   }
 
-  private async notifyProductCreated(product: productStore): Promise<void> {
-    await publishCreateProductRequest({
-      email: product.stores.email,
-      product_id: product.products.id,
-      price: product.products.price,
-      productName: product.products.productName,
-      image: product.products.image,
-      storeName: product.stores.storeName,
-    });
-  }
-
   public async create(store_id: string, data: ProductInsert): Promise<productStore> {
     return this.execute(async () => {
       const store = await this.repo.getStore(store_id);
@@ -38,7 +27,14 @@ export class ProductService {
 
       const product = await this.repo.create(data);
 
-      await this.notifyProductCreated(product);
+       await publishCreateProductRequest({
+      email: product.stores.email,
+      product_id: product.products.id,
+      price: product.products.price,
+      productName: product.products.productName,
+      image: product.products.image,
+      storeName: product.stores.storeName,
+    });
 
       return product;
     }, "Erro ao criar produto", "products/services/product.service.ts/create");

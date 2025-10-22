@@ -3,7 +3,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { ProductSummary } from "@/components/ProductSummary";
 import { useAuth } from "@/contexts/AuthContext";
-import { getMutateCart } from "@/hooks/carts/mutations/cart.mutate";
+import { useGetCarts } from "@/hooks/carts/mutations/cart.mutate";
 import { usePaymentIntent } from "@/hooks/payments/mutations/payment.mutate";
 import type { CartRequest } from "@/types/carts";
 import { CheckoutForm } from "@/components/PaymentForm";
@@ -14,7 +14,7 @@ export function CheckoutPage() {
   const { user } = useAuth();
   const userId = user?.user_id ?? "";
 
-  const { data: cartItens } = getMutateCart(userId) as { data: CartRequest[] | undefined };
+  const { data: cartItens } = useGetCarts(userId);
   const { mutateAsync: createPaymentIntent } = usePaymentIntent();
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -22,7 +22,6 @@ export function CheckoutPage() {
 
   // ✅ evita múltiplas chamadas à API
   const hasRequested = useRef(false);
-
   const total =
     cartItens?.reduce(
       (sum, item) => sum + Number(item.products.price) * item.carts.quantity,
@@ -57,7 +56,7 @@ export function CheckoutPage() {
         setLoading(false);
       }
     })();
-  }, [userId, cartItens]);
+  }, [cartItens]);
 
   if (!cartItens) return <p>Erro ao carregar o carrinho.</p>;
   if (loading) return <p>Carregando pagamento...</p>;

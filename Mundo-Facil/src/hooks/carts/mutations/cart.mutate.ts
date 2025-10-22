@@ -13,7 +13,7 @@ export function createMutateCart() {
   });
 }
 
-export function getMutateCart(user_id: string) {
+export function useGetCarts(user_id: string) {
   return useQuery({
     queryKey: ["carts"],
     queryFn: () => service.getCart(user_id),

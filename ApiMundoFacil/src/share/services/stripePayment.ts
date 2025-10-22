@@ -17,12 +17,9 @@ export async function createPayment(data: CreatePaymentType) {
     const totalAmount = Number(data.total) * 100; // centavos
 
     const itensCarts = data.carts.map((item) => ({
-      productImage: item.products.image,
-      productName: item.products.productName,
-      price: item.products.price,
-      product_id: item.products.id,
-      quantity: item.carts.quantity,
+      cart_id: item.carts.id
     }));
+    console.log("itens do carrinho", itensCarts)
 
     const productSummary = data.carts
       .map(
@@ -45,14 +42,14 @@ export async function createPayment(data: CreatePaymentType) {
         metadata: {
           userId: data.user_id,
           products: productSummary,
-          carts: JSON.stringify(itensCarts),
+          cartsId: JSON.stringify(itensCarts),
         },
       },
       {
         idempotencyKey: `payment-${data.user_id}-${Date.now()}`,
       }
     );
-
+    console.log(`✅ Compra iniciada por usuário: ${data.user_id} `)
     return { clientSecret: paymentIntent.client_secret };
   } catch (error) {
     console.error("Erro ao criar PaymentIntent:", error);
