@@ -5,7 +5,6 @@ import { ProductSummary } from "@/components/ProductSummary";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGetCarts } from "@/hooks/carts/mutations/cart.mutate";
 import { usePaymentIntent } from "@/hooks/payments/mutations/payment.mutate";
-import type { CartRequest } from "@/types/carts";
 import { CheckoutForm } from "@/components/PaymentForm";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY as string);
@@ -20,7 +19,6 @@ export function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ evita múltiplas chamadas à API
   const hasRequested = useRef(false);
   const total =
     cartItens?.reduce(
@@ -34,7 +32,7 @@ export function CheckoutPage() {
       return;
     }
 
-    hasRequested.current = true; // garante execução única
+    hasRequested.current = true; 
 
     (async () => {
       try {
