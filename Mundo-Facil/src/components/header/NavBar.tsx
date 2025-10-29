@@ -1,4 +1,4 @@
-import { Search, Bell, Menu, ShoppingCart, Store } from "lucide-react";
+import { Search, Menu, ShoppingCart, Store } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,7 +15,6 @@ type SearchFormData = {
 export function Navbar() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showMessages, setShowMessages] = useState("left-full");
   const { user } = useAuth();
   const { register, handleSubmit } = useForm<SearchFormData>();
 
@@ -92,20 +91,6 @@ export function Navbar() {
               <Link to={"/carts"}>
                 <ShoppingCart className="h-5 w-5" />
               </Link>
-            </Button>
-
-            {/* Ícone de Notificação */}
-            <Button
-              onClick={() =>
-                setShowMessages(
-                  showMessages === "left-full" ? "right-0" : "left-full"
-                )
-              }
-              variant="ghost"
-              size="icon"
-              className="text-gray-700 hover:bg-blue-50 hover:text-blue-400 transition-all duration-300 rounded-lg"
-            >
-              <Bell className="h-5 w-5" />
             </Button>
 
             {/* Ícone de Loja  */}
@@ -194,16 +179,6 @@ export function Navbar() {
             </div>
           </div>
         )}
-        {/* Messages */}
-        <div
-          className={`fixed ${showMessages} w-2xs h-96 mt-6 space-y-2 p-4 bg-white rounded-lg shadow-lg border border-gray-200 overflow-y-scroll`}
-        >
-          <div className="bg-gray-100 p-2 rounded-lg text-sm text-gray-700">
-            Bem vindo ao Mundo Fácil!
-            <br />
-            Sua jornada de compra simplificada começa agora.
-          </div>
-        </div>
       </div>
     </nav>
   );

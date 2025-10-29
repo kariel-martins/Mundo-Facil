@@ -39,12 +39,7 @@ export function CheckoutForm({ total, data }: CheckoutFormProps) {
       console.error("[Stripe Error]", error);
       setStatus(`Erro: ${error.message}`);
       setIsProcessing(false);
-      navigate("/checkout/cancel",  
-        // {state: { 
-        //   orderId: data[0]?.carts.id,
-        //   errorMessage: error.message 
-        // }}
-      )
+      navigate("/checkout/cancel")
     } else if (paymentIntent?.status === "succeeded") {
       setStatus("Pagamento aprovado! ✅");
       data.map( cart => clearCart(cart.carts.id) )

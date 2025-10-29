@@ -13,13 +13,17 @@ export function CheckoutPage() {
   const { user } = useAuth();
   const userId = user?.user_id ?? "";
 
-  const { data: cartItens } = useGetCarts(userId);
+  const { data, isPending: loadingCart, isError: errorCart } = 
+  useGetCarts(userId);
+  const cartItens = data ?? []
   const { mutateAsync: createPaymentIntent } = usePaymentIntent();
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const hasRequested = useRef(false);
+
   const total =
     cartItens?.reduce(
       (sum, item) => sum + Number(item.products.price) * item.carts.quantity,
@@ -27,12 +31,13 @@ export function CheckoutPage() {
     ) ?? 0;
 
   useEffect(() => {
-    if (!userId || !cartItens?.length || hasRequested.current) {
-      setLoading(false);
+    if (!userId || cartItens.length === 0 || hasRequested.current) {
       return;
     }
 
-    hasRequested.current = true; 
+    hasRequested.current = true;
+    setLoading(true)
+    setError(null);
 
     (async () => {
       try {
@@ -41,51 +46,54 @@ export function CheckoutPage() {
           total,
           carts: cartItens,
         });
-
         const clientSecret =
           response?.data?.clientSecret ?? response?.clientSecret;
 
-        if (clientSecret) {
-          setClientSecret(clientSecret);
+        if (!clientSecret) {
+          throw new Error("Resposta inválida do servidor de pagamento");
         }
+
+        setClientSecret(clientSecret);
       } catch (err) {
         console.error("Erro ao criar PaymentIntent:", err);
+        setError("Falha ao iniciar o pagamento. Tente novamente mais tarde.");
       } finally {
         setLoading(false);
       }
     })();
-  }, [cartItens]);
+  }, [cartItens, userId]);
 
-  if (!cartItens) return <p>Erro ao carregar o carrinho.</p>;
-  if (loading) return <p>Carregando pagamento...</p>;
-  if (cartItens.length === 0) return <p>Seu carrinho está vazio.</p>;
-
-  const options = clientSecret
-    ? { clientSecret, appearance: { theme: "stripe" as const } }
-    : undefined;
+  const options = {
+    clientSecret: clientSecret!,
+    appearance: { theme: "stripe" as const },
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
         <h1 className="text-4xl font-extrabold text-gray-900 mb-10">
           Finalizar Compra 🛍️
         </h1>
+          {loadingCart || loading ? <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-lg font-medium text-gray-700">Carregando pagamento...</p>
+      </div> : error || errorCart ? <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="p-6 border-l-4 border-red-400 text-red-700 bg-white rounded-lg shadow">
+          <p>{error}</p>
+        </div>
+      </div> : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-1">
             <ProductSummary items={cartItens} total={total} />
           </div>
+
           <div className="lg:col-span-2">
-            {clientSecret && options ? (
-              <Elements stripe={stripePromise} options={options}>
-                <CheckoutForm total={total} data={cartItens} />
-              </Elements>
-            ) : (
-              <div className="p-8 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-lg">
-                <p>Falha ao iniciar o pagamento.</p>
-              </div>
-            )}
+            <Elements stripe={stripePromise} options={options}>
+              <CheckoutForm total={total} data={cartItens} />
+            </Elements>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

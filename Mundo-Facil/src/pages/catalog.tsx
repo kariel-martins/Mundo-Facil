@@ -1,7 +1,7 @@
 import { Footer } from "@/components/footer/footer";
 import { Navbar } from "@/components/header/NavBar";
 import { Button } from "@/components/ui/button";
-import { getAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
+import { useGetAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
 import { Filter, Zap } from "lucide-react";
 import { ProductCard } from "@/components/CardProducts";
 import { useState } from "react";
@@ -20,7 +20,7 @@ const MOCK_CATEGORIES = [
 ];
 
 export function CatalogPage() {
-  const { data: allProducts, isLoading, isError } = getAllMutateProducts();
+  const { data: allProducts, isLoading, isError } = useGetAllMutateProducts();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showFreeShipping, setShowFreeShipping] = useState(false);
 

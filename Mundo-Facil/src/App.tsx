@@ -25,6 +25,7 @@ import { CheckoutPage } from "./pages/checkoutPage";
 import { PaymentCancelledPage } from "./pages/CancellationPage";
 import { SuccessPage } from "./pages/SuccessPage";
 import { LogoutPage } from "./pages/logoutPage";
+import { DeleteAccount } from "./pages/DeletarConta";
 
 const queryClient = new QueryClient();
 
@@ -48,8 +49,6 @@ function App() {
               <Route path="/catalog" element={<CatalogPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/products/:product_id" element={<PageProduct />} />
-
-             
               
               <Route element={<PrivateRoute />}>
                 <Route path="/products" element={<PageProduct />} />
@@ -73,6 +72,8 @@ function App() {
                 <Route path="/stores/cadastro" element={<CreateStores />} />
                 <Route path="/stores" element={<Store />} />
                 <Route path="/stores/:store_id" element={<StoreProducts />} />
+
+                <Route path="/excluir" element={<DeleteAccount/>} />
 
                 <Route path="/logout" element={<LogoutPage/>} />
                 

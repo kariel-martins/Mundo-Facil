@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { env } from "../../config/env";
 import { AppError } from "../../errors/AppErro";
 import type { CreatePaymentType } from "../../types/payments";
+import { redis } from "../../database/redis";
 
 const { stripeSecretKey } = env();
 
@@ -16,10 +17,14 @@ export async function createPayment(data: CreatePaymentType) {
 
     const totalAmount = Number(data.total) * 100; // centavos
 
-    const itensCarts = data.carts.map((item) => ({
-      cart_id: item.carts.id
-    }));
-    console.log("itens do carrinho", itensCarts)
+    const saveCartsRedis = data.carts.map((item)=> ({
+      product_id: item.products.id,
+      productName: item.products.productName,
+      price: item.products.price,
+      quantity: item.carts.quantity,
+      productImage: item.products.image,
+    })) 
+    console.log("Esse é os dados do carrinho Temporario", saveCartsRedis)
 
     const productSummary = data.carts
       .map(
@@ -42,13 +47,14 @@ export async function createPayment(data: CreatePaymentType) {
         metadata: {
           userId: data.user_id,
           products: productSummary,
-          cartsId: JSON.stringify(itensCarts),
         },
       },
       {
         idempotencyKey: `payment-${data.user_id}-${Date.now()}`,
       }
     );
+
+    await redis.set("Temp:CartStripeOrder", JSON.stringify(saveCartsRedis), "EX", 1800)
     console.log(`✅ Compra iniciada por usuário: ${data.user_id} `)
     return { clientSecret: paymentIntent.client_secret };
   } catch (error) {

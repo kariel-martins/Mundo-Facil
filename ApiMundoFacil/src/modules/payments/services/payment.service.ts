@@ -6,8 +6,7 @@ import { publishCreateOrderResquest } from "../../../messages/producers/orders.p
 import { CreatePaymentType } from "../../../types/payments";
 import { publishCreatePaymentRequest } from "../../../messages/producers/payments.producers";
 import { redis } from "../../../database/redis";
-import { db } from "../../../database/client.database";
-import { carts } from "../../../database/schema.database";
+
 
 const { stripeSecretKey, stripeWebHoohSecret } = env();
 
@@ -18,6 +17,14 @@ const stripe = new Stripe(stripeSecretKey!, {
 type OrderItemsEmail = {
    productImage: string; productName: string; price: string
 };
+
+type TempCartsRedis = {
+     product_id: string,
+    productName: string,
+    price: string,
+    quantity: number,
+    productImage: string
+}
 
 export { stripe };
 
@@ -43,15 +50,14 @@ export class PaymentService {
       if (event.type === "payment_intent.succeeded") {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const userId = paymentIntent.metadata?.userId;
-        const rawCarts = paymentIntent.metadata?.cartsId;
-
+        const rawCarts = await redis.get("Temp:CartStripeOrder")
+        
         if (!userId || !rawCarts) {
           console.warn("⚠️ Metadados incompletos no PaymentIntent");
           return { received: true };
         }
 
-        const cartsResponce = JSON.parse(rawCarts);
-        console.log("responta do carrinho", cartsResponce)
+        const cartsResponce = JSON.parse(rawCarts) as TempCartsRedis[]
 
         const newOrder = await this.repo.createOrder({
           user_id: userId,
@@ -62,16 +68,14 @@ export class PaymentService {
         const itemsOrder:OrderItemsEmail[] = []
 
         for (const item of cartsResponce) {
-          console.log('esses items', item.cart_id)
-          const resultCards = await this.repo.getAllCarts(item.cart_id)
-
+         
           await this.repo.createOrderProduct({
             order_id: newOrder.orders.id,
-            product_id: resultCards.products.id ?? "",
-            price: resultCards.products.price,
-            quantity: resultCards.carts.quantity ?? 1,
+            product_id: item.product_id ?? "",
+            price: item.price,
+            quantity: item.quantity ?? 1,
           });
-          itemsOrder.push({productName: resultCards.products.productName, productImage: resultCards.products.image, price: resultCards.products.price})
+          itemsOrder.push({productName: item.productName, productImage: item.productImage, price: item.price})
         }
 
         await publishCreateOrderResquest({email: newOrder.users.email, orders: itemsOrder})

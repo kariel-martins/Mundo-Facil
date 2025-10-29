@@ -1,14 +1,14 @@
 import { Footer } from "@/components/footer/footer";
 import { Navbar } from "@/components/header/NavBar";
 import { Button } from "@/components/ui/button";
-import { getAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
+import { useGetAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Filter, ShoppingCart, Truck, ShieldCheck, Star } from "lucide-react";
 import type { ProductData } from "@/types/products";
 
 export function SearchPage() {
   const navigate = useNavigate();
-  const allProduct = getAllMutateProducts();
+  const allProduct = useGetAllMutateProducts();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("product");
 

@@ -1,7 +1,5 @@
 import express from "express";
-import Stripe from "stripe";
 import { Request, Response } from "express";
-import { env } from "../../../config/env";
 import { AppError } from "../../../errors/AppErro";
 import { PaymentService } from "../services/payment.service";
 

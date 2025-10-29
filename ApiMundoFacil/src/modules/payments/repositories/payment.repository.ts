@@ -59,15 +59,6 @@ export class PaymentRepository {
     )
 
   }
-
-  public async getAllCarts(cart_id: string): Promise< cartsProducts >  {
-    return this.execute(
-      async ()=> {
-        const [result] = await db.select().from(carts).where(eq(carts.id, cart_id)).innerJoin(products, eq(products.id, carts.product_id))
-        return result
-      }, "Erro ao processar getAllCarts", "payment/repositories/getAllCarts"
-    )
-  }
   public async update(order_id: string, data: updateOrder): Promise<Order> {
     return this.execute(
       async () => {

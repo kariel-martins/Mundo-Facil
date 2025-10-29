@@ -3,7 +3,7 @@ import { ProductService } from "../services/product.service";
 
 const service = new ProductService()
 
-export function getAllMutateProducts() {
+export function useGetAllMutateProducts() {
     return useQuery({
         queryKey: ["products"],
         queryFn: service.getAll,

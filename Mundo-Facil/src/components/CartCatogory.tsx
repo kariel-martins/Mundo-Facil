@@ -1,4 +1,4 @@
-import { getAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
+import { useGetAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
 import { ProductCard } from "./CardProducts";
 
 type CategoryProps = {
@@ -6,7 +6,8 @@ type CategoryProps = {
 };
 
 export function CategoryCard({ nameCategory }: CategoryProps) {
-  const { data: products, isLoading, isError } = getAllMutateProducts();
+  const { data, isLoading, isError } = useGetAllMutateProducts();
+  const products = data ?? []
 
   return (
     <section
@@ -23,11 +24,10 @@ export function CategoryCard({ nameCategory }: CategoryProps) {
             <p className="text-red-600 font-medium">
               Erro ao buscar produtos. Tente novamente.
             </p>
-          ) : products?.length === 0 ? (
+          ) : products.length === 0 ? (
             <p className="text-gray-500">Não há produtos nesta categoria.</p>
           ) : (
-            products
-              ?.filter((product) =>
+            products.filter((product) =>
                 product.category
                   .toLowerCase()
                   .includes(nameCategory.toLowerCase())

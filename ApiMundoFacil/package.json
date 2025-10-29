@@ -14,7 +14,9 @@
     "db:studio": "npx drizzle-kit studio",
     "build": "tsc",
     "start:dev": "cross-env NODE_ENV=development nodemon src/server.ts",
-    "start:prod": "node dist/server.js"
+    "start:prod": "cross-env NODE_ENV=production nodemon dist/server.js",
+    "start:docker": "npm run db:push && cross-env NODE_ENV=docker node dist/server.js",
+    "start": "node dist/server.js"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.0",

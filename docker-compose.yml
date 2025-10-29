@@ -1,13 +1,12 @@
-networks:
+networks: 
   monitoring:
     driver: bridge
 
 volumes:
   prometheus_data: {}
   grafana_data: {}
-  postgres_data: {}
   redis_data: {}
-  react_build: {}
+  rabbitmq_data: {}
 
 services:
   prometheus:
@@ -18,8 +17,6 @@ services:
       - prometheus_data:/prometheus
     ports:
       - "9090:9090"
-    expose:
-      - 9090
     networks:
       - monitoring
 
@@ -35,55 +32,55 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     ports:
       - "3000:3000"
-    expose:
-      - 3000
-    networks:
-      - monitoring
-  
-  node-application-monitoring-app:
-    build:
-      context: ./ApiMundoFacil
-      dockerfile: Dockerfile
-    container_name: api_node_techshop
-    restart: always
-    ports:
-      - "5050:5050"
-    expose:
-      - 5050
-    env_file: 
-      - ./ApiMundoFacil/.env.production
-    networks:
-      - monitoring
-  
-  react-application-mundo-facil:
-    build:
-      context: ./Mundo-Facil
-      dockerfile: Dockerfile
-    container_name: mundo_facil
-    ports:
-      - "4173:4173"
-    env_file: 
-      - ./Mundo-Facil/.env.development
-      
-    depends_on: 
-      - node-application-monitoring-app
-    volumes:
-      - react_build:/app/dist
     networks:
       - monitoring
 
-  nginx:
-    build: 
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: mundo_facil_nginx
-    volumes:
-      - react_build:/usr/share/nginx/html
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+  redis:
+    image: redis:7
+    container_name: redis_cache
+    restart: always
     ports:
-      - "80:80"
+      - "6379:6379"
+    environment:
+     - REDIS_HOST=redis
+     - REDIS_PORT=6379
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    networks:
+      - monitoring
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_broker
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - monitoring
+
+  node-application-monitoring-app:
+    image: mundo-facil/api:latest
+    build:
+      context: ./ApiMundoFacil
+      dockerfile: Dockerfile
+    container_name: ApiMundoFacil
+    working_dir: /app
+    volumes:
+      - ./ApiMundoFacil:/app
+    restart: always
+    env_file:
+      - ./ApiMundoFacil/.env.docker
+    ports:
+      - "5050:5050"
     depends_on:
-      - node-application-monitoring-app
-      - react-application-mundo-facil
+      - redis
+      - rabbitmq
     networks:
       - monitoring

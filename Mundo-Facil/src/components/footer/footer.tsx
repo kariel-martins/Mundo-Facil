@@ -38,6 +38,9 @@ export function Footer() {
             <Link to="/privacy" className="hover:text-blue-400 transition-colors">
                 Privacidade
             </Link>
+            <Link to="/Excluir" className="hover:text-red-400 transition-colors">
+                Excluir Conta
+            </Link>
           </div>
 
        

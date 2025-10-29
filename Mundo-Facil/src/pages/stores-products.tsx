@@ -2,7 +2,7 @@ import { Footer } from "@/components/footer/footer";
 import { Navbar } from "@/components/header/NavBar";
 import { PieChartComponent } from "@/components/PieChart";
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
+import { useGetAllMutateProducts } from "@/hooks/products/mutation/product.mutate";
 import { getAllMutateStore } from "@/hooks/stores/mutation/stores.mutate";
 import {
   Plus,
@@ -29,7 +29,7 @@ interface Product {
 export function StoreProducts() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: allProductsData, isLoading, isError } = getAllMutateProducts();
+  const { data: allProductsData, isLoading, isError } = useGetAllMutateProducts();
   const { data: allStoresData } = getAllMutateStore(user?.user_id ?? "");
   const { store_id } = useParams();
 
